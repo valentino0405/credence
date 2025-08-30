@@ -1,0 +1,75 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;600&display=swap');
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+.aurora-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* Thin black outline utility keeping original gradient fill */
+.text-outline-black {
+  -webkit-text-stroke: 2px #000;
+  -webkit-text-fill-color: transparent; /* used with bg-clip-text + text-transparent */
+  text-shadow:
+    1px 0 0 #000,
+    -1px 0 0 #000,
+    0 1px 0 #000,
+    0 -1px 0 #000; /* fallback for browsers without stroke */
+}
+
+/* Brand font and styling for navbar title */
+.brand-font {
+  font-family: 'Playfair Display', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: #E6F0FF; /* subtle icy tone */
+  text-shadow: 0 1px 0 rgba(0,0,0,0.6), 0 2px 12px rgba(82,39,255,0.08);
+}
+
+/* PillNav hover effects */
+.pill-nav ul li a {
+  transition: background-color 0.3s ease, color 0.3s ease !important;
+}
+
+/* Default state: dark pills with white text */
+.pill-nav ul li a {
+  background-color: #0b0720 !important;
+  color: #ffffff !important;
+}
+
+/* Hover state: white pills with dark text */
+.pill-nav ul li a:hover {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* Ensure all text elements inside pills also change color on hover */
+.pill-nav ul li a:hover .pill-label,
+.pill-nav ul li a:hover .pill-label-hover {
+  color: #000000 !important;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
