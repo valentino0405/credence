@@ -37,7 +37,6 @@ const PillNav: React.FC<PillNavProps> = ({
   const tlRefs = useRef<(gsap.core.Timeline | null)[]>([]);
   const activeTweenRefs = useRef<(gsap.core.Tween | null)[]>([]);
   const navItemsRef = useRef<HTMLDivElement>(null);
-  const logoRef = useRef<HTMLDivElement>(null);
   const [isClient, setIsClient] = useState<boolean>(false);
 
   // Ensure we're on the client before using GSAP
@@ -133,13 +132,13 @@ const PillNav: React.FC<PillNavProps> = ({
   };
 
   const cssVars: React.CSSProperties = {
-    ["--base" as any]: baseColor,
-    ["--pill-bg" as any]: pillColor,
-    ["--hover-text" as any]: hoveredPillTextColor,
-    ["--pill-text" as any]: resolvedPillTextColor,
-    ["--nav-h" as any]: "28px",
-    ["--pill-pad-x" as any]: "12px",
-    ["--pill-gap" as any]: "4px",
+    ["--base" as string]: baseColor,
+    ["--pill-bg" as string]: pillColor,
+    ["--hover-text" as string]: hoveredPillTextColor,
+    ["--pill-text" as string]: resolvedPillTextColor,
+    ["--nav-h" as string]: "28px",
+    ["--pill-pad-x" as string]: "12px",
+    ["--pill-gap" as string]: "4px",
   };
 
   return (

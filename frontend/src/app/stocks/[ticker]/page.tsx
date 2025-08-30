@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Aurora from '@/app/home/Aurora';
@@ -44,12 +44,44 @@ export default function StockPage(): React.ReactElement {
   const [error, setError] = useState<string | null>(null);
   const [chatInput, setChatInput] = useState<string>('');
 
+  const fetchStockData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/candlestick-data?ticker=${ticker}`);
+      if (!response.ok) throw new Error('Failed to fetch stock data');
+      const data = await response.json();
+      setStockData(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch stock data');
+    } finally {
+      setLoading(false);
+    }
+  }, [ticker]);
+
+  const fetchAIData = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/ai-analysis?ticker=${ticker}`);
+      if (!response.ok) throw new Error('Failed to fetch AI data');
+      const data = await response.json();
+      setAIData(data);
+    } catch (err) {
+      console.error('Failed to fetch AI data:', err);
+    }
+  }, [ticker]);
+
   // Handle redirect in useEffect to avoid render-time state updates
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       router.push('/sign-in');
     }
   }, [isLoaded, isSignedIn, router]);
+
+  useEffect(() => {
+    if (ticker) {
+      fetchStockData();
+      fetchAIData();
+    }
+  }, [ticker, fetchStockData, fetchAIData]);
 
   // Show loading while auth is loading
   if (!isLoaded) {
@@ -68,38 +100,6 @@ export default function StockPage(): React.ReactElement {
       </div>
     );
   }
-
-  useEffect(() => {
-    if (ticker) {
-      fetchStockData();
-      fetchAIData();
-    }
-  }, [ticker]);
-
-  const fetchStockData = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/candlestick-data?ticker=${ticker}`);
-      if (!response.ok) throw new Error('Failed to fetch stock data');
-      const data = await response.json();
-      setStockData(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error fetching data');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchAIData = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/ai-prediction/${ticker}`);
-      if (!response.ok) throw new Error('Failed to fetch AI data');
-      const data = await response.json();
-      setAIData(data);
-    } catch (err) {
-      console.error('Error fetching AI data:', err);
-    }
-  };
 
   const chartOptions = {
     chart: {

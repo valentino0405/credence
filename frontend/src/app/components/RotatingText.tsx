@@ -6,9 +6,8 @@ import {
   useImperativeHandle,
   useMemo,
   useState,
-  Ref,
 } from "react";
-import { motion, AnimatePresence, MotionProps, Transition, Target, TargetAndTransition, VariantLabels } from "motion/react";
+import { motion, AnimatePresence, Transition, Target, TargetAndTransition, VariantLabels } from "motion/react";
 
 function cn(...classes: (string | undefined | null | boolean)[]): string {
   return classes.filter(Boolean).join(" ");

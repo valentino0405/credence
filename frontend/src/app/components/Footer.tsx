@@ -25,7 +25,7 @@ export default function Footer(): React.ReactElement {
 
           <div className="space-y-3 text-sm">
             <h4 className="font-semibold text-white">Feedback</h4>
-            <p className="text-xs text-white/60">We'd love to improve. Share ideas or issues with us.</p>
+            <p className="text-xs text-white/60">We&apos;d love to improve. Share ideas or issues with us.</p>
             <div className="flex flex-col gap-2">
               <Link href="mailto:feedback@aifinance.dev" className="inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-xs font-medium text-white/80 hover:bg-white/10 hover:text-white transition">
                 Send Email Feedback
