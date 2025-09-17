@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: credence-backend
+    runtime: python
+    region: oregon
+    plan: free
+    # Build command
+    buildCommand: "pip install -r requirements.txt"
+    # Start command
+    startCommand: "uvicorn app:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: PYTHON_VERSION
+        value: 3.11.0
+    # Health check
+    healthCheckPath: /docs
