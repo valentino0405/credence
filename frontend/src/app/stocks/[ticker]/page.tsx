@@ -24,11 +24,24 @@ interface StockData {
 
 interface AIData {
   overall_trend: 'BULLISH' | 'BEARISH';
+  current_price: number;
   predictions: Array<{
     timeframe: string;
     direction: 'UP' | 'DOWN';
     target_price: number;
     confidence: number;
+    change_percent?: number;
+  }>;
+  model_accuracy?: {
+    mean_absolute_percentage_error?: number;
+    median_absolute_percentage_error?: number;
+    r2_score?: number;
+    accuracy_period_days?: number;
+  };
+  future_predictions?: Array<{
+    date: string;
+    predicted_price: number;
+    days_ahead: number;
   }>;
 }
 
@@ -60,7 +73,7 @@ export default function StockPage(): React.ReactElement {
 
   const fetchAIData = useCallback(async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/ai-analysis?ticker=${ticker}`);
+      const response = await fetch(`${API_BASE_URL}/ai-prediction/${ticker}`);
       if (!response.ok) throw new Error('Failed to fetch AI data');
       const data = await response.json();
       setAIData(data);
@@ -223,6 +236,51 @@ export default function StockPage(): React.ReactElement {
                   Overall Trend: {aiData.overall_trend === 'BULLISH' ? '📈 BULLISH' : '📉 BEARISH'}
                 </div>
 
+                {/* Model Accuracy Info */}
+                {aiData.model_accuracy && (
+                  <div className="mb-4 p-3 rounded-lg border border-blue-500/30 bg-blue-500/10">
+                    <h4 className="text-xs font-semibold text-blue-300 mb-2 uppercase tracking-wide">Model Accuracy</h4>
+                    <div className="text-xs text-blue-200 space-y-1">
+                      {aiData.model_accuracy.mean_absolute_percentage_error && (
+                        <div>Avg Error: {aiData.model_accuracy.mean_absolute_percentage_error.toFixed(1)}%</div>
+                      )}
+                      {aiData.model_accuracy.r2_score && (
+                        <div>R² Score: {aiData.model_accuracy.r2_score.toFixed(3)}</div>
+                      )}
+                      {aiData.model_accuracy.accuracy_period_days && (
+                        <div>Based on {aiData.model_accuracy.accuracy_period_days} days</div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Current vs Predicted Price Comparison */}
+                <div className="mb-4 p-3 rounded-lg border border-purple-500/30 bg-purple-500/10">
+                  <h4 className="text-xs font-semibold text-purple-300 mb-2 uppercase tracking-wide">Price Analysis</h4>
+                  <div className="text-xs text-purple-200 space-y-1">
+                    <div className="flex justify-between">
+                      <span>Current:</span>
+                      <span className="font-semibold">${stockData?.current_price}</span>
+                    </div>
+                    {aiData.predictions[0] && (
+                      <>
+                        <div className="flex justify-between">
+                          <span>Next Day:</span>
+                          <span className={`font-semibold ${aiData.predictions[0].target_price > (stockData?.current_price || 0) ? 'text-emerald-300' : 'text-red-300'}`}>
+                            ${aiData.predictions[0].target_price}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Change:</span>
+                          <span className={`font-semibold ${aiData.predictions[0].change_percent ? (aiData.predictions[0].change_percent > 0 ? 'text-emerald-300' : 'text-red-300') : 'text-gray-300'}`}>
+                            {aiData.predictions[0].change_percent ? `${aiData.predictions[0].change_percent > 0 ? '+' : ''}${aiData.predictions[0].change_percent.toFixed(2)}%` : 'N/A'}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
                 {/* Predictions */}
                 <div>
                   <h3 className="text-sm font-semibold mb-2 tracking-wide text-white/80 uppercase">Predictions</h3>
@@ -234,17 +292,45 @@ export default function StockPage(): React.ReactElement {
                       </div>
                       <div className="font-medium text-white/80">Target: ${pred.target_price}</div>
                       <div className="font-medium text-white/70">Confidence: {pred.confidence}%</div>
+                      {pred.change_percent !== undefined && (
+                        <div className={`font-medium ${pred.change_percent > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                          {pred.change_percent > 0 ? '+' : ''}{pred.change_percent.toFixed(2)}%
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
+
+                {/* Future Predictions Timeline */}
+                {aiData.future_predictions && aiData.future_predictions.length > 0 && (
+                  <div className="mt-4">
+                    <h3 className="text-sm font-semibold mb-2 tracking-wide text-white/80 uppercase">5-Day Forecast</h3>
+                    <div className="space-y-1">
+                      {aiData.future_predictions.slice(0, 5).map((pred, index) => (
+                        <div key={index} className="flex justify-between items-center text-xs px-2 py-1 rounded bg-white/5">
+                          <span className="text-white/70">{new Date(pred.date).toLocaleDateString()}</span>
+                          <span className={`font-semibold ${pred.predicted_price > (stockData?.current_price || 0) ? 'text-emerald-300' : 'text-red-300'}`}>
+                            ${pred.predicted_price}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
             {/* Simple Chat Interface */}
-            <div className="mt-8">
+            <div className="mt-auto">
               <h3 className="text-sm font-semibold mb-2 tracking-wide text-white/80 uppercase flex items-center gap-1">💬 <span>Ask AI</span></h3>
-              <div className="border border-white/15 rounded-lg bg-white/5 h-48 overflow-auto p-3 mb-2 text-xs text-white/70 italic font-medium">
-                AI Chat coming soon... For now, check the predictions above!
+              <div className="border border-white/15 rounded-lg bg-white/5 h-32 overflow-auto p-3 mb-2 text-xs text-white/70 italic font-medium">
+                🔮 AI analysis complete! The model shows {aiData?.overall_trend === 'BULLISH' ? 'positive momentum' : 'bearish signals'} for {ticker}.
+                {aiData?.model_accuracy?.mean_absolute_percentage_error && (
+                  <>
+                    <br /><br />
+                    📊 Model accuracy: ~{(100 - aiData.model_accuracy.mean_absolute_percentage_error).toFixed(1)}% accurate predictions.
+                  </>
+                )}
               </div>
               <div className="flex gap-2">
                 <input
@@ -257,7 +343,7 @@ export default function StockPage(): React.ReactElement {
                 <button
                   className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs font-medium hover:from-purple-700 hover:to-blue-700 transition"
                   onClick={() => {
-                    alert('Chat feature coming soon!');
+                    alert('Advanced AI chat feature coming soon!');
                     setChatInput('');
                   }}
                 >
