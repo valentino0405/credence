@@ -77,48 +77,125 @@ class StockPredictor:
             if 'Volume' not in df.columns:
                 df['Volume'] = 1000000  # Default volume
             
-            # Add external indicators (VIX and S&P500) with fallbacks
-            try:
-                # Try different VIX tickers
-                for vix_ticker in ['^VIX', 'VIX']:
-                    try:
-                        vix_data = yf.download(vix_ticker, start=start_date, end=end_date, progress=False)
-                        if not vix_data.empty and 'Close' in vix_data.columns:
-                            vix_data = vix_data['Close'].rename('VIX')
-                            df = df.set_index('Date').join(vix_data, how='left').reset_index()
-                            logger.info(f"Successfully fetched VIX data using {vix_ticker}")
-                            break
-                    except:
-                        continue
-                else:
-                    raise ValueError("All VIX tickers failed")
-            except:
-                logger.info("Using realistic VIX synthetic data (12-30 range)")
-                # Use more realistic VIX values (typically 10-35)
-                df['VIX'] = np.random.uniform(12, 30, len(df))
+            # Add external indicators with robust waterfall strategy
             
+            # Ensure Date is a proper column for joins
+            if 'Date' not in df.columns and df.index.name != 'Date':
+                df = df.reset_index()
+            
+            # If index is still a DatetimeIndex, move it to a column
+            if isinstance(df.index, pd.DatetimeIndex):
+                df['Date'] = df.index
+                df = df.reset_index(drop=True)
+            
+            # S&P500 Data (SPY is much more reliable than ^GSPC)
+            sp500_obtained = False
             try:
-                # Try different S&P500 tickers
-                for sp_ticker in ['^GSPC', 'SPY']:
-                    try:
-                        sp500_data = yf.download(sp_ticker, start=start_date, end=end_date, progress=False)
-                        if not sp500_data.empty and 'Close' in sp500_data.columns:
-                            sp500_data = sp500_data['Close'].rename('SP500')
-                            df = df.set_index('Date').join(sp500_data, how='left').reset_index()
-                            logger.info(f"Successfully fetched S&P500 data using {sp_ticker}")
-                            break
-                    except:
-                        continue
+                logger.info("Attempting to fetch S&P500 data using SPY...")
+                spy_data = yf.download('SPY', start=start_date, end=end_date, progress=False)
+                if not spy_data.empty and 'Close' in spy_data.columns:
+                    # SPY trades around $450, scale to S&P500 level (~4500)
+                    sp500_data = spy_data['Close'] * 10
+                    # Create DataFrame with proper alignment
+                    spy_df = pd.DataFrame({
+                        'Date': spy_data.index.values,
+                        'SP500': sp500_data.values.flatten()
+                    })
+                    df = df.merge(spy_df, on='Date', how='left')
+                    logger.info("✅ Successfully fetched S&P500 data using SPY!")
+                    sp500_obtained = True
                 else:
-                    raise ValueError("All S&P500 tickers failed")
-            except:
-                logger.info("Using realistic S&P500 synthetic data (4000-5000 range)")
-                # Use more realistic S&P500 values (typically 3500-5500)
+                    raise ValueError("SPY data empty")
+            except Exception as e:
+                logger.warning(f"SPY failed: {e}")
+                
+                # Fallback: Try original S&P500 index
+                try:
+                    logger.info("Fallback: Trying ^GSPC...")
+                    sp500_data = yf.download('^GSPC', start=start_date, end=end_date, progress=False)
+                    if not sp500_data.empty and 'Close' in sp500_data.columns:
+                        sp500_close = sp500_data['Close']
+                        gspc_df = pd.DataFrame({
+                            'Date': sp500_data.index.values,
+                            'SP500': sp500_close.values.flatten()
+                        })
+                        df = df.merge(gspc_df, on='Date', how='left')
+                        logger.info("✅ Successfully fetched S&P500 data using ^GSPC!")
+                        sp500_obtained = True
+                    else:
+                        raise ValueError("^GSPC data empty")
+                except Exception as e2:
+                    logger.warning(f"^GSPC also failed: {e2}")
+            
+            # If all S&P500 methods failed, use smart synthetic data
+            if not sp500_obtained:
+                logger.info("🔄 Using smart synthetic S&P500 data (market-correlated)")
+                # Base S&P500 around 4500, with some realistic variance
                 base_sp500 = 4500
-                df['SP500'] = base_sp500 + np.random.normal(0, 200, len(df))
+                try:
+                    stock_trend = df['Close'].rolling(window=20).mean()
+                    trend_normalized = (stock_trend - stock_trend.mean()) / stock_trend.std()
+                    df['SP500'] = base_sp500 + (trend_normalized * 300).fillna(0)
+                except:
+                    # Simple fallback if rolling calculation fails
+                    df['SP500'] = base_sp500 + np.random.normal(0, 200, len(df))
             
-            # Fill any remaining NaN values
-            df = df.fillna(method='ffill').fillna(method='bfill')
+            # VIX Data (Try original first, then ETF)
+            vix_obtained = False
+            try:
+                logger.info("Attempting to fetch VIX data using ^VIX...")
+                vix_data = yf.download('^VIX', start=start_date, end=end_date, progress=False)
+                if not vix_data.empty and 'Close' in vix_data.columns:
+                    vix_close = vix_data['Close']
+                    vix_df = pd.DataFrame({
+                        'Date': vix_data.index.values,
+                        'VIX': vix_close.values.flatten()
+                    })
+                    df = df.merge(vix_df, on='Date', how='left')
+                    logger.info("✅ Successfully fetched VIX data using ^VIX!")
+                    vix_obtained = True
+                else:
+                    raise ValueError("^VIX data empty")
+            except Exception as e:
+                logger.warning(f"^VIX failed: {e}")
+                
+                # Fallback: Try VIX ETF
+                try:
+                    logger.info("Fallback: Trying VIXY (VIX ETF)...")
+                    vixy_data = yf.download('VIXY', start=start_date, end=end_date, progress=False)
+                    if not vixy_data.empty and 'Close' in vixy_data.columns:
+                        # VIXY needs scaling to match VIX range (typically 10-35)
+                        vixy_close = vixy_data['Close']
+                        # Scale VIXY to VIX-like range
+                        vix_scaled = 15 + (vixy_close - vixy_close.mean()) / vixy_close.std() * 8
+                        vix_scaled = vix_scaled.clip(8, 50)  # Keep in reasonable VIX range
+                        vixy_df = pd.DataFrame({
+                            'Date': vixy_data.index.values,
+                            'VIX': vix_scaled.values.flatten()
+                        })
+                        df = df.merge(vixy_df, on='Date', how='left')
+                        logger.info("✅ Successfully fetched VIX data using VIXY (scaled)!")
+                        vix_obtained = True
+                    else:
+                        raise ValueError("VIXY data empty")
+                except Exception as e2:
+                    logger.warning(f"VIXY also failed: {e2}")
+            
+            # If all VIX methods failed, use smart synthetic data
+            if not vix_obtained:
+                logger.info("🔄 Using smart synthetic VIX data (volatility-correlated)")
+                try:
+                    # Calculate stock volatility and map to VIX-like values
+                    stock_returns = df['Close'].pct_change()
+                    rolling_volatility = stock_returns.rolling(window=20).std() * 100
+                    # Map volatility to VIX range (higher volatility = higher VIX)
+                    df['VIX'] = 15 + (rolling_volatility * 5).fillna(15).clip(10, 40)
+                except:
+                    # Simple fallback if volatility calculation fails
+                    df['VIX'] = 20 + np.random.normal(0, 8, len(df))
+            
+            # Fill any remaining NaN values using forward fill then backward fill
+            df = df.ffill().bfill()
             
             return df
             
