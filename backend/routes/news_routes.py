@@ -304,8 +304,8 @@ async def fetch_rss_news():
         # Remove mock data
         await news_collection.delete_many({"url": {"$regex": "example-"}})
         
-        # Fetch real RSS news articles
-        news_articles = await indian_rss_news_service.fetch_rss_news(hours_back=48)  # Last 48 hours
+        # Fetch real RSS news articles (limited to top 5 for quick processing)
+        news_articles = await indian_rss_news_service.fetch_rss_news(hours_back=24)  # Last 24 hours, top 5 articles
         news_saved = 0
         
         if news_articles:

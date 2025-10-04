@@ -19,7 +19,8 @@ logger = logging.getLogger(__name__)
 
 class IndianRSSNewsService:
     def __init__(self):
-        self.client = genai.Client(api_key=os.getenv('GOOGLE_API_KEY'))
+        # Initialize Gemini client - using the same pattern as our working test
+        self.client = genai.Client()
         
         # Indian financial RSS feeds
         self.rss_feeds = {
@@ -107,7 +108,15 @@ class IndianRSSNewsService:
                         continue
             
             logger.info(f"🎯 Found {len(all_articles)} relevant Indian financial news articles")
-            return all_articles
+            
+            # Sort by published date (most recent first) and limit to top 5 for quick processing
+            all_articles.sort(key=lambda x: x['published_at'], reverse=True)
+            limited_articles = all_articles[:5]  # Process only top 5 most recent articles
+            
+            if len(all_articles) > 5:
+                logger.info(f"🎯 Limited to top {len(limited_articles)} most recent articles for fast processing")
+            
+            return limited_articles
             
         except Exception as e:
             logger.error(f"❌ Error fetching RSS news: {e}")
@@ -137,23 +146,21 @@ class IndianRSSNewsService:
         """Analyze sentiment using Gemini AI for Indian market context"""
         try:
             prompt = f"""
-            Analyze the sentiment of this Indian financial news article for stock market impact:
+            Analyze this Indian financial news sentiment quickly:
             
             Title: {title}
-            Content: {text}
+            Content: {text[:500]}
             
-            Provide analysis in JSON format:
+            Return JSON:
             {{
                 "overall_sentiment": "positive/negative/neutral",
-                "confidence_score": 0.0-1.0,
+                "confidence_score": 0.7,
                 "market_impact": "bullish/bearish/neutral",
-                "key_entities": ["entity1", "entity2"],
-                "impact_score": 0.0-1.0,
-                "reasoning": "brief explanation",
-                "indian_context": "specific Indian market relevance"
+                "key_entities": ["stock1", "stock2"],
+                "impact_score": 0.7,
+                "reasoning": "brief reason",
+                "indian_context": "Indian market impact"
             }}
-            
-            Focus on Indian stocks, NIFTY/SENSEX impact, RBI policies, Indian companies, and rupee implications.
             """
             
             response = await asyncio.to_thread(
