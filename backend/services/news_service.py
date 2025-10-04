@@ -1,6 +1,15 @@
 """
 Indian News API Service
-Fetches and processes Indian financial news
+Fetches and proce            # Query 1: General Indian market news
+            market_news = self.news_api.get_everything(
+                q='Indian stock market OR NIFTY OR SENSEX OR BSE OR NSE',
+                sources=','.join(self.indian_sources),
+                language='en',
+                from_param=from_date.strftime('%Y-%m-%d'),
+                to=to_date.strftime('%Y-%m-%d'),
+                sort_by='publishedAt',
+                page_size=50
+            )n financial news
 """
 import os
 import asyncio
@@ -62,8 +71,8 @@ class IndianNewsService:
                 q='Reliance OR TCS OR Infosys OR HDFC OR Indian economy OR RBI',
                 sources=','.join(self.indian_sources),
                 language='en',
-                from_param=from_date.isoformat(),
-                to=to_date.isoformat(),
+                from_param=from_date.strftime('%Y-%m-%d'),
+                to=to_date.strftime('%Y-%m-%d'),
                 sort_by='publishedAt',
                 page_size=50
             )

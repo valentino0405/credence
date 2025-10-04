@@ -5,6 +5,7 @@ Indian market focused endpoints
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from datetime import datetime
 from services.news_service import indian_news_service
+from services.rss_news_service import indian_rss_news_service
 from services.reddit_service import indian_reddit_service
 from database.config import get_database, COLLECTIONS
 import logging
@@ -128,9 +129,9 @@ async def get_indian_market_sentiment():
 
 @router.get("/latest-news")
 async def get_latest_indian_news(limit: int = 20):
-    """Get latest Indian financial news with sentiment analysis"""
+    """Get latest Indian financial news with sentiment analysis from RSS feeds"""
     try:
-        news_summary = await indian_news_service.get_latest_news_summary(limit=limit)
+        news_summary = await indian_rss_news_service.get_latest_news_summary(limit=limit)
         
         return {
             "status": "success", 
@@ -249,6 +250,122 @@ async def debug_database():
     except Exception as e:
         logger.error(f"❌ Error in debug endpoint: {e}")
         raise HTTPException(status_code=500, detail=f"Debug error: {str(e)}")
+
+@router.get("/test-reddit")
+async def test_reddit_connection():
+    """Test Reddit API connection"""
+    try:
+        logger.info("🔄 Testing Reddit API connection...")
+        
+        # Try to fetch just one post from IndiaInvestments to test connection
+        subreddit = await indian_reddit_service.reddit.subreddit("IndiaInvestments")
+        
+        # Get just the first post
+        post_found = False
+        async for post in subreddit.hot(limit=1):
+            post_found = True
+            return {
+                "status": "success",
+                "message": "Reddit API connection successful",
+                "test_post": {
+                    "title": post.title,
+                    "subreddit": "IndiaInvestments",
+                    "score": post.score,
+                    "created_utc": post.created_utc
+                },
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        
+        if not post_found:
+            return {
+                "status": "warning",
+                "message": "Connected to Reddit but no posts found",
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        
+    except Exception as e:
+        logger.error(f"❌ Error testing Reddit connection: {e}")
+        return {
+            "status": "error",
+            "message": f"Reddit API connection failed: {str(e)}",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+
+@router.post("/fetch-rss-news")
+async def fetch_rss_news():
+    """Fetch real-time Indian financial news from RSS feeds"""
+    try:
+        logger.info("🔄 Fetching real-time RSS news...")
+        
+        # Clear existing mock data first
+        db = await get_database()
+        news_collection = db[COLLECTIONS["news_articles"]]
+        
+        # Remove mock data
+        await news_collection.delete_many({"url": {"$regex": "example-"}})
+        
+        # Fetch real RSS news articles
+        news_articles = await indian_rss_news_service.fetch_rss_news(hours_back=48)  # Last 48 hours
+        news_saved = 0
+        
+        if news_articles:
+            news_saved = await indian_rss_news_service.save_news_to_db(news_articles)
+        
+        return {
+            "status": "success",
+            "message": f"Successfully fetched RSS news data",
+            "news_articles_saved": news_saved,
+            "news_articles_found": len(news_articles),
+            "sources": list(indian_rss_news_service.rss_feeds.keys()),
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ Error fetching RSS news: {e}")
+        raise HTTPException(status_code=500, detail=f"Error fetching RSS news: {str(e)}")
+
+@router.post("/fetch-real-data")
+async def fetch_real_data():
+    """Fetch real-time data from NewsAPI and Reddit"""
+    try:
+        logger.info("🔄 Fetching real-time data from APIs...")
+        
+        # Clear existing mock data first
+        db = await get_database()
+        news_collection = db[COLLECTIONS["news_articles"]]
+        reddit_collection = db[COLLECTIONS["reddit_posts"]]
+        
+        # Remove mock data
+        await news_collection.delete_many({"url": {"$regex": "example-"}})
+        await reddit_collection.delete_many({"reddit_id": {"$regex": "mock_"}})
+        
+        # Fetch real Reddit discussions
+        reddit_posts = await indian_reddit_service.fetch_indian_stock_discussions(hours_back=168)  # Last 7 days
+        reddit_saved = 0
+        
+        if reddit_posts:
+            reddit_saved = await indian_reddit_service.save_reddit_data_to_db(reddit_posts)
+        
+        # Fetch real news articles
+        news_articles = await indian_news_service.fetch_indian_financial_news()
+        news_saved = 0
+        
+        if news_articles:
+            news_saved = await indian_news_service.save_news_to_db(news_articles)
+        
+        return {
+            "status": "success",
+            "message": f"Successfully fetched real-time data",
+            "news_articles_saved": news_saved,
+            "reddit_posts_saved": reddit_saved,
+            "reddit_posts_found": len(reddit_posts),
+            "news_articles_found": len(news_articles),
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ Error fetching real data: {e}")
+        raise HTTPException(status_code=500, detail=f"Error fetching real data: {str(e)}")
 
 @router.post("/populate-mock-data")
 async def populate_mock_data():

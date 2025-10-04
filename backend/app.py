@@ -7,6 +7,10 @@ import random
 from stock_predictor import predictor
 import logging
 from contextlib import asynccontextmanager
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Import new modules
 from database.config import Database

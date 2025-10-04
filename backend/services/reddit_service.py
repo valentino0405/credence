@@ -3,7 +3,7 @@ Reddit Sentiment Analysis Service for Indian Stock Communities
 """
 import os
 import asyncio
-import praw
+import asyncpraw
 from datetime import datetime, timedelta
 import google.generativeai as genai
 from database.config import get_database, COLLECTIONS
@@ -14,10 +14,11 @@ logger = logging.getLogger(__name__)
 
 class IndianRedditService:
     def __init__(self):
-        self.reddit = praw.Reddit(
+        self.reddit = asyncpraw.Reddit(
             client_id=os.getenv('REDDIT_CLIENT_ID'),
             client_secret=os.getenv('REDDIT_CLIENT_SECRET'),
-            user_agent=os.getenv('REDDIT_USER_AGENT')
+            user_agent=os.getenv('REDDIT_USER_AGENT'),
+            timeout=30  # 30 second timeout
         )
         genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
         self.model = genai.GenerativeModel('gemini-1.5-pro')
@@ -39,61 +40,79 @@ class IndianRedditService:
         ]
 
     async def fetch_indian_stock_discussions(self, hours_back: int = 24) -> List[Dict]:
-        """Fetch Reddit discussions about Indian stocks"""
+        """Fetch Reddit discussions about Indian stocks using AsyncPRAW"""
         try:
+            logger.info(f"🔍 Fetching real Reddit discussions from last {hours_back} hours...")
             all_posts = []
             cutoff_time = datetime.utcnow() - timedelta(hours=hours_back)
             
             for subreddit_name in self.indian_subreddits:
                 try:
-                    subreddit = self.reddit.subreddit(subreddit_name)
+                    logger.info(f"📡 Fetching from r/{subreddit_name}...")
+                    subreddit = await self.reddit.subreddit(subreddit_name)
                     
-                    # Get hot posts
-                    for post in subreddit.hot(limit=50):
-                        post_time = datetime.utcfromtimestamp(post.created_utc)
-                        if post_time < cutoff_time:
-                            continue
+                    # Get hot posts (async) with timeout
+                    post_count = 0
+                    async with asyncio.timeout(60):  # 60 second timeout per subreddit
+                        async for post in subreddit.hot(limit=50):
+                            post_time = datetime.utcfromtimestamp(post.created_utc)
+                            if post_time < cutoff_time:
+                                continue
+                                
+                            # Check if post is related to Indian stocks
+                            title_lower = post.title.lower()
+                            selftext_lower = (post.selftext or '').lower()
                             
-                        # Check if post is related to Indian stocks
-                        title_lower = post.title.lower()
-                        selftext_lower = (post.selftext or '').lower()
-                        
-                        is_indian_stock_related = any(
-                            keyword.lower() in title_lower or keyword.lower() in selftext_lower
-                            for keyword in self.indian_stock_keywords
-                        )
-                        
-                        if is_indian_stock_related:
-                            # Get top comments
-                            post.comments.replace_more(limit=0)
-                            top_comments = []
-                            for comment in post.comments[:10]:  # Top 10 comments
-                                if hasattr(comment, 'body') and len(comment.body) > 20:
-                                    top_comments.append({
-                                        'body': comment.body,
-                                        'score': comment.score,
-                                        'created_utc': comment.created_utc
-                                    })
+                            is_indian_stock_related = any(
+                                keyword.lower() in title_lower or keyword.lower() in selftext_lower
+                                for keyword in self.indian_stock_keywords
+                            )
                             
-                            all_posts.append({
-                                'id': post.id,
-                                'title': post.title,
-                                'selftext': post.selftext,
-                                'subreddit': subreddit_name,
-                                'score': post.score,
-                                'upvote_ratio': post.upvote_ratio,
-                                'num_comments': post.num_comments,
-                                'created_utc': post.created_utc,
-                                'url': post.url,
-                                'comments': top_comments,
-                                'permalink': f"https://reddit.com{post.permalink}"
-                            })
+                            if is_indian_stock_related:
+                                logger.info(f"📝 Found relevant post: {post.title[:50]}...")
+                                
+                                # Get top comments (async)
+                                await post.comments.replace_more(limit=0)
+                                top_comments = []
+                                comment_count = 0
+                                for comment in post.comments:
+                                    if comment_count >= 5:  # Limit to 5 comments
+                                        break
+                                    if hasattr(comment, 'body') and len(comment.body) > 20:
+                                        top_comments.append({
+                                            'body': comment.body,
+                                            'score': comment.score,
+                                            'created_utc': comment.created_utc
+                                        })
+                                        comment_count += 1
+                                
+                                all_posts.append({
+                                    'id': post.id,
+                                    'title': post.title,
+                                    'selftext': post.selftext,
+                                    'subreddit': subreddit_name,
+                                    'score': post.score,
+                                    'upvote_ratio': post.upvote_ratio,
+                                    'num_comments': post.num_comments,
+                                    'created_utc': post.created_utc,
+                                    'url': post.url,
+                                    'comments': top_comments,
+                                    'permalink': f"https://reddit.com{post.permalink}"
+                                })
+                                post_count += 1
+                                
+                                # Limit to 10 posts per subreddit to avoid timeout
+                                if post_count >= 10:
+                                    break
                             
+                except asyncio.TimeoutError:
+                    logger.warning(f"⚠️ Timeout fetching from r/{subreddit_name} after 60 seconds")
+                    continue
                 except Exception as e:
                     logger.warning(f"⚠️ Error fetching from r/{subreddit_name}: {e}")
                     continue
             
-            logger.info(f"🔍 Found {len(all_posts)} Indian stock-related Reddit posts")
+            logger.info(f"🎯 Found {len(all_posts)} real Indian stock-related Reddit posts")
             return all_posts
             
         except Exception as e:
@@ -295,6 +314,13 @@ class IndianRedditService:
                 "posts_sample": [],
                 "last_updated": datetime.utcnow().isoformat()
             }
+
+    async def close(self):
+        """Close the Reddit connection"""
+        try:
+            await self.reddit.close()
+        except Exception as e:
+            logger.error(f"Error closing Reddit connection: {e}")
 
 # Create service instance
 indian_reddit_service = IndianRedditService()
