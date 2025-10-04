@@ -6,12 +6,44 @@ from datetime import datetime, timedelta
 import random
 from stock_predictor import predictor
 import logging
+from contextlib import asynccontextmanager
+
+# Import new modules
+from database.config import Database
+from routes.news_routes import router as news_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="AI Trading API", version="1.0.0")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manage application lifecycle"""
+    # Startup
+    logger.info("🚀 Starting Credence AI Trading API...")
+    try:
+        await Database.connect()
+        Database.connect_sync()
+        logger.info("✅ Database connections established")
+    except Exception as e:
+        logger.warning(f"⚠️ Database connection failed: {e}")
+        logger.info("🔄 Running in offline mode (basic functionality only)")
+    
+    yield
+    
+    # Shutdown
+    logger.info("🔌 Shutting down...")
+    try:
+        await Database.disconnect()
+    except:
+        pass
+
+app = FastAPI(
+    title="Credence AI Trading API", 
+    version="2.0.0",
+    description="AI-powered Indian stock market analysis and predictions",
+    lifespan=lifespan
+)
 
 # Add CORS middleware to allow frontend requests
 app.add_middleware(
@@ -24,9 +56,42 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include new routers
+app.include_router(news_router)
+
 @app.get("/")
 def root():
-    return {"message": "AI Trading API is running!", "docs": "/docs"}
+    return {
+        "message": "Credence AI Trading API is running!",
+        "version": "2.0.0",
+        "docs": "/docs",
+        "features": [
+            "Indian Stock Predictions",
+            "News Sentiment Analysis", 
+            "Reddit Social Sentiment",
+            "Real-time Market Data"
+        ]
+    }
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint"""
+    try:
+        # Test database connection
+        if Database.client:
+            await Database.client.admin.command('ping')
+            db_status = "connected"
+        else:
+            db_status = "disconnected"
+    except:
+        db_status = "disconnected"
+    
+    return {
+        "status": "healthy",
+        "database": db_status,
+        "timestamp": datetime.now().isoformat(),
+        "indian_market_focus": True
+    }
 
 @app.get("/candlestick-data")
 def get_candlestick_data(ticker: str = "AAPL"):

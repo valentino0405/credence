@@ -7,7 +7,7 @@
 5.pip install fastapi uvicorn yfinance pandas python-multipart pydantic
 
 6.(myenv) PS C:\Users\VALENTINO GOMES\OneDrive\Desktop\ai_finance> cd backend
-  (myenv) PS C:\Users\VALENTINO GOMES\OneDrive\Desktop\ai_finance\backend> python -m uvicorn app:app --reload --host 127.0.0.1 --port 8000
+  (myenv) PS C:\Users\VALENTINO GOMES\OneDrive\Desktop\ai_finance\backend> python -m uvicorn app:app --reload --host 0.0.0.0 --port 8000
 
 
 

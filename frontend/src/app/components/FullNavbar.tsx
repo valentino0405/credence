@@ -48,6 +48,7 @@ export default function FullNavbar(): React.ReactElement {
     { href: "/home", label: "Home" },
     { href: "/market", label: "Market" },
     { href: "/prediction", label: "Predictions" },
+    { href: "/news", label: "News" },
     { href: "/dashboard", label: "Dashboard" }
   ];
   

@@ -9,3 +9,17 @@ scikit-learn==1.5.1
 numpy==1.26.4
 matplotlib==3.8.4
 plotly==5.22.0
+
+# AI & LLM Integration
+google-generativeai
+pymongo
+motor
+redis
+newsapi-python
+praw
+feedparser
+fredapi
+ta
+textblob
+python-dotenv
+celery
