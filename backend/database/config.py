@@ -71,5 +71,11 @@ COLLECTIONS = {
     "stock_predictions": "indian_stock_predictions",
     "economic_indicators": "indian_economic_data",
     "user_preferences": "user_preferences",
-    "market_analysis": "indian_market_analysis"
+    "market_analysis": "indian_market_analysis",
+    # Trading simulation collections
+    "user_portfolios": "user_portfolios",
+    "user_trades": "user_trades", 
+    "user_watchlists": "user_watchlists",
+    "stock_prices": "indian_stock_prices",
+    "trading_sessions": "user_trading_sessions"
 }

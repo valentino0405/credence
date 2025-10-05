@@ -15,6 +15,8 @@ load_dotenv()
 # Import new modules
 from database.config import Database
 from routes.news_routes import router as news_router
+from routes.webhook_routes import router as webhook_router
+from routes.trading_routes import router as trading_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -62,6 +64,8 @@ app.add_middleware(
 
 # Include new routers
 app.include_router(news_router)
+app.include_router(webhook_router)
+app.include_router(trading_router)
 
 @app.get("/")
 def root():
