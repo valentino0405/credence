@@ -1,11 +1,14 @@
 "use client";
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   EyeIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
-  ChartBarIcon
+  ChartBarIcon,
+  PlusIcon,
+  MagnifyingGlassIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline';
 import { API_BASE_URL } from '@/config/api';
 
@@ -18,10 +21,17 @@ interface StockData {
   volume: number;
 }
 
+interface AvailableStock {
+  symbol: string;
+  name: string;
+  exchange: string;
+}
+
 interface WatchlistProps {
   watchlist: StockData[];
   selectedStock: StockData | null;
   onStockSelect: (symbol: string) => void;
+  onAddToWatchlist?: (symbol: string) => void;
 }
 
 export default function Watchlist({ watchlist, selectedStock, onStockSelect }: WatchlistProps) {

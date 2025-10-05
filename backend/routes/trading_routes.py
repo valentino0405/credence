@@ -185,6 +185,50 @@ async def get_market_overview():
         logger.error(f"❌ Error getting market overview: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/available-stocks")
+async def get_available_stocks():
+    """Get all available Indian stocks for trading"""
+    try:
+        logger.info("📋 Getting available Indian stocks...")
+        
+        # Get all available stocks with basic info
+        stocks = []
+        for symbol, name in indian_stock_service.indian_stocks.items():
+            stocks.append({
+                "symbol": symbol,
+                "name": name,
+                "exchange": "NSE"
+            })
+        
+        logger.info(f"✅ Found {len(stocks)} available stocks")
+        
+        return {
+            "status": "success",
+            "data": {
+                "stocks": stocks,
+                "total_count": len(stocks)
+            }
+        }
+    except Exception as e:
+        logger.error(f"❌ Error getting available stocks: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/search")
+async def search_stocks(q: str = Query(..., min_length=1)):
+    """Search for stocks by name or symbol"""
+    try:
+        results = await indian_stock_service.search_stocks(q)
+        return {
+            "status": "success",
+            "data": {
+                "query": q,
+                "results": results
+            }
+        }
+    except Exception as e:
+        logger.error(f"❌ Error searching stocks: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("/stock/{symbol}/chart")
 async def get_stock_chart_data(symbol: str, period: str = Query("1mo", regex="^(1d|5d|1mo|3mo|6mo|1y)$")):
     """Get historical chart data for a stock"""
