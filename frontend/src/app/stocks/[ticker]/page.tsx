@@ -57,7 +57,6 @@ export default function StockPage(): React.ReactElement {
   const [aiError, setAIError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [chatInput, setChatInput] = useState<string>('');
 
   const fetchStockData = useCallback(async () => {
     try {
@@ -244,9 +243,9 @@ export default function StockPage(): React.ReactElement {
           </div>
         </div>
 
-        {/* Right Panel - AI Predictions & Chat (25%) */}
-        <div className="flex-1 p-4 pr-5 border-l border-white/5 overflow-auto">
-          <div className="rounded-2xl border border-white/10 bg-black/20 backdrop-blur-md p-4 h-full flex flex-col shadow-lg shadow-black/30">
+        {/* Right Panel - AI Predictions (25%) */}
+        <div className="flex-1 p-4 pr-4 border-l border-white/5 flex flex-col">
+          <div className="rounded-2xl border border-white/10 bg-black/20 backdrop-blur-md p-6 flex-1 shadow-lg shadow-black/30 overflow-y-auto">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-white">🤖 <span>AI Predictions</span></h2>
 
             {/* Loading State */}
@@ -323,21 +322,34 @@ export default function StockPage(): React.ReactElement {
                 </div>
 
                 {/* Predictions */}
-                <div>
-                  <h3 className="text-sm font-semibold mb-2 tracking-wide text-white/80 uppercase">Predictions</h3>
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold mb-4 tracking-wide text-white/80 uppercase">Predictions</h3>
                   {aiData.predictions.map((pred, index) => (
-                    <div key={index} className="mb-2 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs">
-                      <div className="font-semibold text-white/90">{pred.timeframe}</div>
-                      <div className={"font-bold " + (pred.direction === 'UP' ? 'text-emerald-400' : 'text-red-400')}>
-                        {pred.direction === 'UP' ? '⬆️' : '⬇️'} {pred.direction}
-                      </div>
-                      <div className="font-medium text-white/80">Target: ${pred.target_price}</div>
-                      <div className="font-medium text-white/70">Confidence: {pred.confidence}%</div>
-                      {pred.change_percent !== undefined && (
-                        <div className={`font-medium ${pred.change_percent > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                          {pred.change_percent > 0 ? '+' : ''}{pred.change_percent.toFixed(2)}%
+                    <div key={index} className="rounded-xl border border-white/15 bg-white/5 p-4 hover:bg-white/10 transition-colors">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="font-semibold text-white/90 text-sm">{pred.timeframe}</div>
+                        <div className={`text-xs px-2 py-1 rounded-full font-medium ${pred.direction === 'UP' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'}`}>
+                          {pred.direction === 'UP' ? '⬆️ UP' : '⬇️ DOWN'}
                         </div>
-                      )}
+                      </div>
+                      <div className="space-y-1 text-xs">
+                        <div className="flex justify-between items-center">
+                          <span className="text-white/70">Target Price:</span>
+                          <span className="font-semibold text-white/90">${pred.target_price}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-white/70">Confidence:</span>
+                          <span className="font-semibold text-blue-300">{pred.confidence}%</span>
+                        </div>
+                        {pred.change_percent !== undefined && (
+                          <div className="flex justify-between items-center">
+                            <span className="text-white/70">Expected Change:</span>
+                            <span className={`font-semibold ${pred.change_percent > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                              {pred.change_percent > 0 ? '+' : ''}{pred.change_percent.toFixed(2)}%
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -361,37 +373,31 @@ export default function StockPage(): React.ReactElement {
               </div>
             )}
 
-            {/* Simple Chat Interface */}
-            <div className="mt-auto">
-              <h3 className="text-sm font-semibold mb-2 tracking-wide text-white/80 uppercase flex items-center gap-1">💬 <span>Ask AI</span></h3>
-              <div className="border border-white/15 rounded-lg bg-white/5 h-32 overflow-auto p-3 mb-2 text-xs text-white/70 italic font-medium">
-                🔮 AI analysis complete! The model shows {aiData?.overall_trend === 'BULLISH' ? 'positive momentum' : 'bearish signals'} for {ticker}.
-                {aiData?.model_accuracy?.mean_absolute_percentage_error && (
-                  <>
-                    <br /><br />
-                    📊 Model accuracy: ~{(100 - aiData.model_accuracy.mean_absolute_percentage_error).toFixed(1)}% accurate predictions.
-                  </>
-                )}
+            {/* AI Analysis Summary */}
+            {!aiLoading && !aiError && aiData && (
+              <div className="mt-6 p-4 rounded-lg border border-white/15 bg-white/5">
+                <h3 className="text-sm font-semibold mb-3 tracking-wide text-white/90 uppercase">� Analysis Summary</h3>
+                <div className="text-xs text-white/70 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-white/80">Overall Trend:</span>
+                    <span className={`font-semibold ${aiData.overall_trend === 'BULLISH' ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {aiData.overall_trend === 'BULLISH' ? '📈 BULLISH' : '📉 BEARISH'}
+                    </span>
+                  </div>
+                  {aiData.model_accuracy?.mean_absolute_percentage_error && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-white/80">Model Accuracy:</span>
+                      <span className="font-semibold text-blue-400">
+                        ~{(100 - aiData.model_accuracy.mean_absolute_percentage_error).toFixed(1)}%
+                      </span>
+                    </div>
+                  )}
+                  <div className="text-white/60 text-xs italic mt-3">
+                    Predictions based on XGBoost ML model. Past performance doesn't guarantee future results.
+                  </div>
+                </div>
               </div>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  placeholder="Ask about the stock..."
-                  className="flex-1 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/40"
-                />
-                <button
-                  className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs font-medium hover:from-purple-700 hover:to-blue-700 transition"
-                  onClick={() => {
-                    alert('Advanced AI chat feature coming soon!');
-                    setChatInput('');
-                  }}
-                >
-                  Send
-                </button>
-              </div>
-            </div>
+            )}
 
             {/* Refresh Button */}
             <button
@@ -399,7 +405,7 @@ export default function StockPage(): React.ReactElement {
                 fetchStockData();
                 fetchAIData();
               }}
-              className="mt-4 w-full rounded-lg bg-emerald-600/80 hover:bg-emerald-600 text-white text-xs font-medium py-3 transition"
+              className="mt-6 w-full rounded-lg bg-emerald-600/80 hover:bg-emerald-600 text-white text-sm font-medium py-3 transition-colors flex items-center justify-center gap-2"
             >
               🔄 Refresh Data
             </button>
