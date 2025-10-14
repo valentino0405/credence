@@ -57,7 +57,7 @@ export default function OrderPanel({ stock, portfolio, onTradeComplete }: OrderP
     setIsPlacingOrder(true);
     
     try {
-      const endpoint = orderType === 'buy' ? `${API_BASE_URL}/api/v1/trading/buy` : `${API_BASE_URL}/api/v1/trading/sell`;
+      const endpoint = orderType === 'buy' ? `${API_BASE_URL}/trading/buy` : `${API_BASE_URL}/trading/sell`;
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -65,19 +65,20 @@ export default function OrderPanel({ stock, portfolio, onTradeComplete }: OrderP
         },
         body: JSON.stringify({
           user_id: userId,
-          symbol: stock.symbol,
-          quantity: quantity
+          ticker: stock.symbol,
+          quantity: quantity,
+          price: stock.price
         })
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        toast.success(result.message);
+        toast.success(result.message || `${orderType === 'buy' ? 'Buy' : 'Sell'} order executed successfully!`);
         onTradeComplete();
         setQuantity(1); // Reset quantity
       } else {
-        toast.error(result.detail || 'Order failed');
+        toast.error(result.detail || result.error || 'Order failed');
       }
     } catch (error) {
       console.error('Order error:', error);

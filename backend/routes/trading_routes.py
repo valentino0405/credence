@@ -137,6 +137,50 @@ async def search_stocks(q: str = Query(..., min_length=1)):
         logger.error(f"❌ Error searching stocks: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/performance/{user_id}")
+async def get_portfolio_performance(user_id: str):
+    """Get detailed portfolio performance analytics"""
+    try:
+        performance = await trading_service.calculate_portfolio_performance(user_id)
+        return {
+            "status": "success",
+            "data": performance
+        }
+    except Exception as e:
+        logger.error(f"❌ Error getting portfolio performance: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/risk-assessment")
+async def assess_trade_risk(user_id: str, symbol: str, quantity: int):
+    """Assess risk for a potential trade"""
+    try:
+        if quantity <= 0:
+            raise HTTPException(status_code=400, detail="Quantity must be positive")
+        
+        risk_data = await trading_service.risk_assessment(user_id, symbol, quantity)
+        return {
+            "status": "success",
+            "data": risk_data
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Error in risk assessment: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/insights/{user_id}")
+async def get_trading_insights(user_id: str):
+    """Get personalized trading insights and recommendations"""
+    try:
+        insights = await trading_service.generate_trading_insights(user_id)
+        return {
+            "status": "success",
+            "data": insights
+        }
+    except Exception as e:
+        logger.error(f"❌ Error getting trading insights: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("/watchlist/{user_id}")
 async def get_user_watchlist(user_id: str):
     """Get user's watchlist with current prices"""

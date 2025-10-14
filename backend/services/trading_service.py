@@ -413,5 +413,243 @@ class TradingService:
             "updated_at": datetime.utcnow()
         }
 
+    async def calculate_portfolio_performance(self, user_id: str) -> Dict:
+        """Calculate detailed portfolio performance metrics"""
+        try:
+            portfolio = await self.get_user_portfolio(user_id)
+            trades = await self.get_trade_history(user_id, limit=1000)
+            
+            if not trades:
+                return {
+                    "total_return": 0,
+                    "daily_return": 0,
+                    "win_rate": 0,
+                    "profit_factor": 0,
+                    "sharpe_ratio": 0,
+                    "max_drawdown": 0,
+                    "best_trade": None,
+                    "worst_trade": None
+                }
+            
+            # Calculate trade statistics
+            profitable_trades = []
+            losing_trades = []
+            all_returns = []
+            
+            for trade in trades:
+                if trade["action"] == "sell":
+                    # Find corresponding buy trade
+                    buy_trades = [t for t in trades if t["symbol"] == trade["symbol"] and t["action"] == "buy" and t["timestamp"] < trade["timestamp"]]
+                    if buy_trades:
+                        avg_buy_price = sum(t["price"] for t in buy_trades) / len(buy_trades)
+                        trade_return = (trade["price"] - avg_buy_price) / avg_buy_price * 100
+                        all_returns.append(trade_return)
+                        
+                        if trade_return > 0:
+                            profitable_trades.append(trade_return)
+                        else:
+                            losing_trades.append(abs(trade_return))
+            
+            # Performance metrics
+            win_rate = len(profitable_trades) / len(all_returns) * 100 if all_returns else 0
+            profit_factor = (sum(profitable_trades) / sum(losing_trades)) if losing_trades else float('inf') if profitable_trades else 0
+            
+            # Total return
+            initial_value = 1000000.0  # Starting amount
+            current_value = portfolio["total_portfolio_value"]
+            total_return = ((current_value - initial_value) / initial_value) * 100
+            
+            # Best and worst trades
+            best_trade = max(all_returns) if all_returns else 0
+            worst_trade = min(all_returns) if all_returns else 0
+            
+            return {
+                "total_return": round(total_return, 2),
+                "win_rate": round(win_rate, 2),
+                "profit_factor": round(profit_factor, 2),
+                "total_trades": len(trades),
+                "profitable_trades": len(profitable_trades),
+                "losing_trades": len(losing_trades),
+                "best_trade": round(best_trade, 2),
+                "worst_trade": round(worst_trade, 2),
+                "average_return": round(sum(all_returns) / len(all_returns), 2) if all_returns else 0
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Error calculating portfolio performance: {e}")
+            return {}
+
+    async def risk_assessment(self, user_id: str, symbol: str, quantity: int) -> Dict:
+        """Assess risk for a potential trade"""
+        try:
+            portfolio = await self.get_user_portfolio(user_id)
+            stock_data = await indian_stock_service.get_real_time_price(symbol)
+            
+            if not stock_data:
+                return {"risk_level": "HIGH", "message": "Unable to assess risk - no stock data"}
+            
+            current_price = stock_data.get("price", 0)
+            order_value = quantity * current_price
+            portfolio_value = portfolio["total_portfolio_value"]
+            
+            # Risk factors
+            position_size = (order_value / portfolio_value) * 100
+            cash_utilization = (order_value / portfolio["cash_balance"]) * 100
+            
+            # Existing position check
+            existing_position = 0
+            for holding in portfolio["holdings"]:
+                if holding["symbol"] == symbol:
+                    existing_position = holding["quantity"] * current_price
+                    break
+            
+            total_exposure = (order_value + existing_position) / portfolio_value * 100
+            
+            # Risk assessment
+            risk_factors = []
+            risk_level = "LOW"
+            
+            if position_size > 20:
+                risk_factors.append("Large position size (>20% of portfolio)")
+                risk_level = "HIGH"
+            elif position_size > 10:
+                risk_factors.append("Moderate position size (>10% of portfolio)")
+                risk_level = "MEDIUM"
+            
+            if cash_utilization > 80:
+                risk_factors.append("High cash utilization (>80%)")
+                risk_level = "HIGH"
+            
+            if total_exposure > 25:
+                risk_factors.append("High concentration risk in single stock")
+                risk_level = "HIGH"
+            
+            # Diversification check
+            unique_stocks = len(set(h["symbol"] for h in portfolio["holdings"]))
+            if unique_stocks < 3 and order_value > 100000:
+                risk_factors.append("Low diversification")
+                risk_level = "MEDIUM" if risk_level == "LOW" else risk_level
+            
+            return {
+                "risk_level": risk_level,
+                "position_size_percent": round(position_size, 2),
+                "cash_utilization_percent": round(cash_utilization, 2),
+                "total_exposure_percent": round(total_exposure, 2),
+                "risk_factors": risk_factors,
+                "recommendation": self._get_risk_recommendation(risk_level, risk_factors)
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Error in risk assessment: {e}")
+            return {"risk_level": "HIGH", "message": "Error assessing risk"}
+
+    def _get_risk_recommendation(self, risk_level: str, risk_factors: List[str]) -> str:
+        """Get risk-based recommendation"""
+        if risk_level == "HIGH":
+            return "⚠️ High risk trade. Consider reducing position size or diversifying."
+        elif risk_level == "MEDIUM":
+            return "⚡ Moderate risk. Monitor position size and market conditions."
+        else:
+            return "✅ Low risk trade. Good diversification opportunity."
+
+    async def generate_trading_insights(self, user_id: str) -> Dict:
+        """Generate personalized trading insights"""
+        try:
+            portfolio = await self.get_user_portfolio(user_id)
+            performance = await self.calculate_portfolio_performance(user_id)
+            
+            insights = []
+            recommendations = []
+            
+            # Portfolio analysis
+            if portfolio["total_pnl_percent"] > 10:
+                insights.append("🎉 Excellent portfolio performance! You're beating market averages.")
+            elif portfolio["total_pnl_percent"] < -10:
+                insights.append("📉 Portfolio underperforming. Consider reviewing your strategy.")
+            
+            # Cash management
+            cash_percent = (portfolio["cash_balance"] / portfolio["total_portfolio_value"]) * 100
+            if cash_percent > 50:
+                recommendations.append("💰 High cash position. Consider investing for better returns.")
+            elif cash_percent < 5:
+                recommendations.append("⚠️ Low cash reserves. Keep some cash for opportunities.")
+            
+            # Diversification analysis
+            holdings_count = len(portfolio["holdings"])
+            if holdings_count < 3:
+                recommendations.append("🎯 Consider diversifying across more stocks to reduce risk.")
+            elif holdings_count > 15:
+                recommendations.append("📊 High number of positions. Consider consolidating top performers.")
+            
+            # Performance insights
+            if performance.get("win_rate", 0) < 40:
+                insights.append("🎲 Low win rate detected. Focus on better entry timing.")
+            elif performance.get("win_rate", 0) > 70:
+                insights.append("🏆 Great win rate! You're picking winners consistently.")
+            
+            return {
+                "insights": insights,
+                "recommendations": recommendations,
+                "portfolio_score": self._calculate_portfolio_score(portfolio, performance),
+                "next_action": self._suggest_next_action(portfolio, performance)
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Error generating trading insights: {e}")
+            return {"insights": [], "recommendations": []}
+
+    def _calculate_portfolio_score(self, portfolio: Dict, performance: Dict) -> int:
+        """Calculate portfolio health score out of 100"""
+        score = 50  # Base score
+        
+        # Performance component (30 points)
+        if portfolio["total_pnl_percent"] > 15:
+            score += 30
+        elif portfolio["total_pnl_percent"] > 5:
+            score += 20
+        elif portfolio["total_pnl_percent"] > 0:
+            score += 10
+        elif portfolio["total_pnl_percent"] < -15:
+            score -= 20
+        
+        # Diversification component (20 points)
+        holdings_count = len(portfolio["holdings"])
+        if 5 <= holdings_count <= 12:
+            score += 20
+        elif 3 <= holdings_count <= 15:
+            score += 10
+        
+        # Cash management (20 points)
+        cash_percent = (portfolio["cash_balance"] / portfolio["total_portfolio_value"]) * 100
+        if 10 <= cash_percent <= 30:
+            score += 20
+        elif 5 <= cash_percent <= 50:
+            score += 10
+        
+        # Win rate (30 points)
+        win_rate = performance.get("win_rate", 0)
+        if win_rate > 60:
+            score += 30
+        elif win_rate > 45:
+            score += 20
+        elif win_rate > 30:
+            score += 10
+        
+        return max(0, min(100, score))
+
+    def _suggest_next_action(self, portfolio: Dict, performance: Dict) -> str:
+        """Suggest next trading action"""
+        cash_percent = (portfolio["cash_balance"] / portfolio["total_portfolio_value"]) * 100
+        holdings_count = len(portfolio["holdings"])
+        
+        if cash_percent > 50:
+            return "Consider investing excess cash in diversified stocks"
+        elif holdings_count < 3:
+            return "Focus on building a diversified portfolio with 3-5 quality stocks"
+        elif portfolio["total_pnl_percent"] < -5:
+            return "Review underperforming positions and consider rebalancing"
+        else:
+            return "Monitor current positions and look for new opportunities"
+
 # Global instance
 trading_service = TradingService()

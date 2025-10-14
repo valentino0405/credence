@@ -92,10 +92,20 @@ export default function TradingDashboard(): React.ReactElement | null {
 
   const loadPortfolio = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/trading/portfolio/${userId}`);
+      const response = await fetch(`${API_BASE_URL}/trading/portfolio-performance/${userId}`);
       if (response.ok) {
         const result = await response.json();
-        setPortfolio(result.data);
+        setPortfolio({
+          user_id: userId || '',
+          cash_balance: 100000, // Mock initial balance
+          holdings: result.holdings || [],
+          total_invested: result.total_invested || 0,
+          current_value: result.total_value || 0,
+          total_pnl: result.profit_loss || 0,
+          total_pnl_percent: result.profit_loss_percentage || 0,
+          total_portfolio_value: result.total_value || 100000,
+          total_trades: result.holdings?.length || 0
+        });
       }
     } catch (error) {
       console.error('Error loading portfolio:', error);

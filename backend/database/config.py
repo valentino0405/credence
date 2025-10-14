@@ -77,5 +77,9 @@ COLLECTIONS = {
     "user_trades": "user_trades", 
     "user_watchlists": "user_watchlists",
     "stock_prices": "indian_stock_prices",
-    "trading_sessions": "user_trading_sessions"
+    "trading_sessions": "user_trading_sessions",
+    # AI Chatbot collections
+    "chat_conversations": "chat_conversations",
+    "chat_sessions": "chat_sessions",
+    "ai_insights": "ai_generated_insights"
 }

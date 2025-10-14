@@ -49,6 +49,7 @@ export default function FullNavbar(): React.ReactElement {
     { href: "/market", label: "Market" },
     { href: "/prediction", label: "Predictions" },
     { href: "/news", label: "News" },
+    { href: "/chatbot", label: "AI Chat" },
     { href: "/dashboard", label: "Dashboard" }
   ];
   

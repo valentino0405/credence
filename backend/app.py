@@ -17,6 +17,8 @@ from database.config import Database
 from routes.news_routes import router as news_router
 from routes.webhook_routes import router as webhook_router
 from routes.trading_routes import router as trading_router
+from routes.chatbot_routes import router as chatbot_router
+from routes.simple_chat_routes import router as simple_chat_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -66,6 +68,8 @@ app.add_middleware(
 app.include_router(news_router)
 app.include_router(webhook_router)
 app.include_router(trading_router)
+# app.include_router(chatbot_router)  # Temporarily disabled
+app.include_router(simple_chat_router)
 
 @app.get("/")
 def root():
@@ -242,26 +246,64 @@ def get_ai_prediction(ticker: str):
         raise HTTPException(status_code=500, detail=f"Error generating prediction: {str(e)}")
 
 @app.get("/advanced-prediction/{ticker}")
-def get_advanced_prediction(ticker: str, days: int = 5):
+def get_advanced_prediction(ticker: str, days: int = 30):
     """
-    Get detailed future price predictions for multiple days
+    Get detailed future price predictions for up to 30 days with multiple scenarios
+    """
+    try:
+        if days < 1 or days > 30:
+            raise HTTPException(status_code=400, detail="Days must be between 1 and 30")
+        
+        # Get enhanced predictions with scenarios
+        predictions = predictor.predict_future_prices(ticker, days=days)
+        
+        # Get prediction summary for easier consumption
+        summary = predictor.get_extended_prediction_summary(ticker, days=days)
+        
+        # Get accuracy metrics
+        accuracy = predictor.get_prediction_accuracy(ticker)
+        
+        return {
+            "status": "success",
+            "summary": summary.get("summary", {}),
+            "detailed_predictions": predictions,
+            "accuracy_metrics": accuracy,
+            "features": {
+                "multiple_scenarios": True,
+                "confidence_decay": True,
+                "extended_range": f"1-{days} days",
+                "volatility_adjusted": True
+            },
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting advanced prediction for {ticker}: {e}")
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
+@app.get("/prediction-scenarios/{ticker}")
+def get_prediction_scenarios(ticker: str, days: int = 30):
+    """
+    Get multiple prediction scenarios (optimistic, realistic, pessimistic)
     """
     try:
         if days < 1 or days > 30:
             raise HTTPException(status_code=400, detail="Days must be between 1 and 30")
         
         predictions = predictor.predict_future_prices(ticker, days=days)
-        accuracy = predictor.get_prediction_accuracy(ticker)
         
         return {
             "status": "success",
-            "predictions": predictions,
-            "accuracy_metrics": accuracy,
+            "ticker": ticker,
+            "scenarios": predictions.get("prediction_scenarios", {}),
+            "methodology": predictions.get("confidence_methodology", ""),
+            "current_price": predictions.get("current_price", 0),
+            "volatility": predictions.get("volatility_estimate", 0),
             "timestamp": datetime.now().isoformat()
         }
         
     except Exception as e:
-        logger.error(f"Error getting advanced prediction for {ticker}: {e}")
+        logger.error(f"Error getting prediction scenarios for {ticker}: {e}")
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
 @app.post("/train-model/{ticker}")
