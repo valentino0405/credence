@@ -187,8 +187,12 @@ def get_ai_prediction(ticker: str):
         # Get accuracy statistics
         accuracy_stats = predictor.get_prediction_accuracy(ticker)
         
-        # Calculate trends based on predictions
-        predictions_data = future_predictions["predictions"]
+        # Extract predictions data from scenarios
+        scenarios = future_predictions.get("prediction_scenarios", {})
+        base_scenario = scenarios.get("base", {})
+        predictions_data = base_scenario.get("predictions", [])
+        
+        # Calculate next day and week prices
         next_day_price = predictions_data[0]["predicted_price"] if predictions_data else current_price
         week_price = predictions_data[-1]["predicted_price"] if len(predictions_data) >= 5 else current_price
         
@@ -216,9 +220,9 @@ def get_ai_prediction(ticker: str):
             },
             {
                 "timeframe": "3 Days",
-                "direction": "UP" if predictions_data[2]["predicted_price"] > current_price else "DOWN" if len(predictions_data) >= 3 else "NEUTRAL",
+                "direction": "UP" if len(predictions_data) >= 3 and predictions_data[2]["predicted_price"] > current_price else "DOWN" if len(predictions_data) >= 3 else "NEUTRAL",
                 "confidence": round(min(90, max(55, base_confidence - 5)), 1),
-                "target_price": round(predictions_data[2]["predicted_price"], 2) if len(predictions_data) >= 3 else current_price,
+                "target_price": round(predictions_data[2]["predicted_price"], 2) if len(predictions_data) >= 3 else round(current_price, 2),
                 "change_percent": round(((predictions_data[2]["predicted_price"] - current_price) / current_price) * 100, 2) if len(predictions_data) >= 3 else 0
             },
             {
@@ -237,6 +241,7 @@ def get_ai_prediction(ticker: str):
             "predictions": predictions,
             "model_accuracy": accuracy_stats,
             "future_predictions": predictions_data,
+            "prediction_scenarios": scenarios,  # Include scenarios for debugging
             "timestamp": datetime.now().isoformat(),
             "disclaimer": "Predictions based on XGBoost ML model. Past performance doesn't guarantee future results."
         }

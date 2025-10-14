@@ -53,6 +53,8 @@ export default function StockPage(): React.ReactElement {
   
   const [stockData, setStockData] = useState<StockData | null>(null);
   const [aiData, setAIData] = useState<AIData | null>(null);
+  const [aiLoading, setAILoading] = useState<boolean>(true);
+  const [aiError, setAIError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [chatInput, setChatInput] = useState<string>('');
@@ -73,12 +75,30 @@ export default function StockPage(): React.ReactElement {
 
   const fetchAIData = useCallback(async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/ai-prediction/${ticker}`);
-      if (!response.ok) throw new Error('Failed to fetch AI data');
+      setAILoading(true);
+      setAIError(null);
+      
+      const url = `${API_BASE_URL}/ai-prediction/${ticker}`;
+      console.log('🚀 Fetching AI predictions from:', url);
+      
+      const response = await fetch(url);
+      console.log('📡 AI prediction response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ AI prediction error:', response.status, errorText);
+        throw new Error(`Failed to fetch AI data: ${response.status} ${errorText}`);
+      }
+      
       const data = await response.json();
+      console.log('✅ AI prediction data received:', data);
       setAIData(data);
     } catch (err) {
-      console.error('Failed to fetch AI data:', err);
+      console.error('❌ Failed to fetch AI data:', err);
+      setAIError(err instanceof Error ? err.message : 'Failed to load AI predictions');
+      setAIData(null);
+    } finally {
+      setAILoading(false);
     }
   }, [ticker]);
 
@@ -229,8 +249,29 @@ export default function StockPage(): React.ReactElement {
           <div className="rounded-2xl border border-white/10 bg-black/20 backdrop-blur-md p-4 h-full flex flex-col shadow-lg shadow-black/30">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-white">🤖 <span>AI Predictions</span></h2>
 
+            {/* Loading State */}
+            {aiLoading && (
+              <div className="flex items-center justify-center p-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                <span className="ml-3 text-white/70">Loading AI predictions...</span>
+              </div>
+            )}
+
+            {/* Error State */}
+            {aiError && (
+              <div className="mb-4 p-3 rounded-lg border border-red-500/30 bg-red-500/10 text-red-300">
+                <div className="text-sm">❌ {aiError}</div>
+                <button 
+                  onClick={() => fetchAIData()}
+                  className="mt-2 px-3 py-1 text-xs bg-red-500/20 hover:bg-red-500/30 rounded border border-red-500/30 transition-colors"
+                >
+                  Retry
+                </button>
+              </div>
+            )}
+
             {/* AI Trend */}
-            {aiData && (
+            {!aiLoading && !aiError && aiData && (
               <div className="mb-6">
                 <div className={"mb-4 rounded-lg border px-3 py-2 text-sm font-medium " + (aiData.overall_trend === 'BULLISH' ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : 'border-red-500/30 bg-red-500/10 text-red-300')}>
                   Overall Trend: {aiData.overall_trend === 'BULLISH' ? '📈 BULLISH' : '📉 BEARISH'}
