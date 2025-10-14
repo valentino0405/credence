@@ -5,6 +5,7 @@ import FullNavbar from "@/app/components/FullNavbar";
 import Footer from "@/app/components/Footer";
 import ClientCursorWrapper from "@/app/client-cursor-wrapper";
 import { ClerkProvider } from '@clerk/nextjs';
+import UserTracker from '@/app/components/UserTracker';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <html lang="en">
         <body className={`relative min-h-screen flex flex-col ${geistSans.variable} ${geistMono.variable} antialiased`}>
           <ClientCursorWrapper />
+          <UserTracker />
           <FullNavbar />
           <main className="flex-1 pt-16">{children}</main>
           <Footer />
