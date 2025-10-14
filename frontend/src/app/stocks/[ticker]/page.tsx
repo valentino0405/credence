@@ -55,6 +55,9 @@ export default function StockPage(): React.ReactElement {
   const [aiData, setAIData] = useState<AIData | null>(null);
   const [aiLoading, setAILoading] = useState<boolean>(true);
   const [aiError, setAIError] = useState<string | null>(null);
+  const [thirtyDayData, setThirtyDayData] = useState<any>(null);
+  const [thirtyDayLoading, setThirtyDayLoading] = useState<boolean>(false);
+  const [showThirtyDay, setShowThirtyDay] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -98,6 +101,34 @@ export default function StockPage(): React.ReactElement {
       setAIData(null);
     } finally {
       setAILoading(false);
+    }
+  }, [ticker]);
+
+  const fetch30DayData = useCallback(async () => {
+    try {
+      setThirtyDayLoading(true);
+      
+      const url = `${API_BASE_URL}/prediction-30day/${ticker}`;
+      console.log('🚀 Fetching 30-day predictions from:', url);
+      
+      const response = await fetch(url);
+      console.log('📡 30-day prediction response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ 30-day prediction error:', response.status, errorText);
+        throw new Error(`Failed to fetch 30-day data: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('✅ 30-day prediction data received:', data);
+      setThirtyDayData(data);
+      setShowThirtyDay(true);
+    } catch (err) {
+      console.error('❌ Failed to fetch 30-day data:', err);
+      setThirtyDayData(null);
+    } finally {
+      setThirtyDayLoading(false);
     }
   }, [ticker]);
 
@@ -399,13 +430,92 @@ export default function StockPage(): React.ReactElement {
               </div>
             )}
 
+            {/* 30-Day Prediction Button */}
+            <div className="mt-6 space-y-3">
+              <button
+                onClick={fetch30DayData}
+                disabled={thirtyDayLoading}
+                className="w-full rounded-lg bg-purple-600/80 hover:bg-purple-600 disabled:bg-purple-600/40 text-white text-sm font-medium py-3 transition-colors flex items-center justify-center gap-2"
+              >
+                {thirtyDayLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Loading 30-Day...
+                  </>
+                ) : (
+                  <>
+                    📈 Get 30-Day Forecast
+                  </>
+                )}
+              </button>
+
+              {/* 30-Day Predictions Display */}
+              {showThirtyDay && thirtyDayData && (
+                <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 p-4">
+                  <h3 className="text-sm font-semibold mb-3 text-purple-300 uppercase tracking-wide">30-Day Forecast</h3>
+                  
+                  <div className="space-y-3 text-xs">
+                    <div className="flex justify-between items-center">
+                      <span className="text-white/70">Final Price:</span>
+                      <span className="font-semibold text-white">${thirtyDayData.final_predicted_price}</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-white/70">Total Change:</span>
+                      <span className={`font-semibold ${thirtyDayData.total_expected_change > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {thirtyDayData.total_expected_change > 0 ? '+' : ''}{thirtyDayData.total_expected_change}%
+                      </span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-white/70">Overall Trend:</span>
+                      <span className={`font-semibold ${thirtyDayData.overall_trend === 'BULLISH' ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {thirtyDayData.overall_trend === 'BULLISH' ? '📈 BULLISH' : '📉 BEARISH'}
+                      </span>
+                    </div>
+
+                    {thirtyDayData.key_milestones && (
+                      <div className="mt-4 space-y-2">
+                        <div className="text-white/80 font-medium">Key Milestones:</div>
+                        {thirtyDayData.key_milestones.next_week && (
+                          <div className="flex justify-between text-xs">
+                            <span className="text-white/60">1 Week:</span>
+                            <span className="text-white/80">${thirtyDayData.key_milestones.next_week.predicted_price}</span>
+                          </div>
+                        )}
+                        {thirtyDayData.key_milestones.two_weeks && (
+                          <div className="flex justify-between text-xs">
+                            <span className="text-white/60">2 Weeks:</span>
+                            <span className="text-white/80">${thirtyDayData.key_milestones.two_weeks.predicted_price}</span>
+                          </div>
+                        )}
+                        {thirtyDayData.key_milestones.one_month && (
+                          <div className="flex justify-between text-xs">
+                            <span className="text-white/60">1 Month:</span>
+                            <span className="text-white/80">${thirtyDayData.key_milestones.one_month.predicted_price}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <button
+                      onClick={() => setShowThirtyDay(false)}
+                      className="mt-3 w-full text-xs text-purple-300 hover:text-purple-200 transition-colors"
+                    >
+                      Hide 30-Day Forecast
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Refresh Button */}
             <button
               onClick={() => {
                 fetchStockData();
                 fetchAIData();
               }}
-              className="mt-6 w-full rounded-lg bg-emerald-600/80 hover:bg-emerald-600 text-white text-sm font-medium py-3 transition-colors flex items-center justify-center gap-2"
+              className="mt-4 w-full rounded-lg bg-emerald-600/80 hover:bg-emerald-600 text-white text-sm font-medium py-3 transition-colors flex items-center justify-center gap-2"
             >
               🔄 Refresh Data
             </button>

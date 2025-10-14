@@ -407,17 +407,19 @@ class StockPredictor:
             ma10_current = df['MA_10'].iloc[-1] 
             ma20_current = df['MA_20'].iloc[-1]
             
-            # Determine trend strength
+            # Determine trend strength (adjust for longer predictions)
+            trend_multiplier = 1.0 if days <= 7 else 0.7 if days <= 15 else 0.5  # Reduce trend for longer predictions
+            
             if current_price > ma5_current > ma10_current > ma20_current:
-                trend_strength = 0.015  # Strong uptrend (1.5% daily)
+                trend_strength = 0.012 * trend_multiplier  # Strong uptrend
             elif current_price > ma5_current > ma10_current:
-                trend_strength = 0.008  # Moderate uptrend (0.8% daily)
+                trend_strength = 0.006 * trend_multiplier  # Moderate uptrend
             elif current_price < ma5_current < ma10_current < ma20_current:
-                trend_strength = -0.015  # Strong downtrend
+                trend_strength = -0.012 * trend_multiplier  # Strong downtrend
             elif current_price < ma5_current < ma10_current:
-                trend_strength = -0.008  # Moderate downtrend
+                trend_strength = -0.006 * trend_multiplier  # Moderate downtrend
             else:
-                trend_strength = 0.002  # Slight upward bias (markets tend to go up long term)
+                trend_strength = 0.002 * trend_multiplier  # Slight upward bias
             
             # Generate realistic predictions with some randomness
             predictions = []

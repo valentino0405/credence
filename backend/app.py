@@ -173,13 +173,17 @@ def get_stock_info(ticker: str):
         raise HTTPException(status_code=500, detail=f"Error fetching stock info: {str(e)}")
 
 @app.get("/ai-prediction/{ticker}")
-def get_ai_prediction(ticker: str):
+def get_ai_prediction(ticker: str, days: int = 5):
     """
     Get AI prediction for stock movement using trained XGBoost model
     """
     try:
+        # Validate days parameter
+        if days < 1 or days > 30:
+            days = min(30, max(1, days))
+            
         # Get future price predictions
-        future_predictions = predictor.predict_future_prices(ticker, days=5)
+        future_predictions = predictor.predict_future_prices(ticker, days=days)
         
         # Get current price for comparison
         current_price = future_predictions["current_price"]
@@ -249,6 +253,56 @@ def get_ai_prediction(ticker: str):
     except Exception as e:
         logger.error(f"Error generating AI prediction for {ticker}: {e}")
         raise HTTPException(status_code=500, detail=f"Error generating prediction: {str(e)}")
+
+@app.get("/prediction-30day/{ticker}")
+def get_30day_prediction(ticker: str):
+    """
+    Get 30-day price predictions with weekly and monthly milestones
+    """
+    try:
+        # Get 30-day predictions
+        future_predictions = predictor.predict_future_prices(ticker, days=30)
+        
+        # Get current price and accuracy stats
+        current_price = future_predictions["current_price"]
+        accuracy_stats = predictor.get_prediction_accuracy(ticker)
+        
+        # Extract predictions data from scenarios
+        scenarios = future_predictions.get("prediction_scenarios", {})
+        base_scenario = scenarios.get("base", {})
+        predictions_data = base_scenario.get("predictions", [])
+        
+        # Extract key milestone predictions
+        milestones = {
+            "next_day": predictions_data[0] if len(predictions_data) > 0 else None,
+            "next_week": predictions_data[6] if len(predictions_data) > 6 else None,
+            "two_weeks": predictions_data[13] if len(predictions_data) > 13 else None,
+            "one_month": predictions_data[-1] if len(predictions_data) > 0 else None
+        }
+        
+        # Calculate overall trend for 30 days
+        final_price = predictions_data[-1]["predicted_price"] if predictions_data else current_price
+        overall_trend = "BULLISH" if final_price > current_price else "BEARISH"
+        total_change = ((final_price - current_price) / current_price) * 100 if predictions_data else 0
+        
+        return {
+            "ticker": ticker.upper(),
+            "prediction_period": "30 days",
+            "current_price": round(current_price, 2),
+            "final_predicted_price": round(final_price, 2),
+            "overall_trend": overall_trend,
+            "total_expected_change": round(total_change, 2),
+            "key_milestones": milestones,
+            "daily_predictions": predictions_data,
+            "model_accuracy": accuracy_stats,
+            "technical_indicators": future_predictions.get("technical_indicators", {}),
+            "timestamp": datetime.now().isoformat(),
+            "disclaimer": "30-day predictions have higher uncertainty. Use for general trend analysis only."
+        }
+        
+    except Exception as e:
+        logger.error(f"Error generating 30-day prediction for {ticker}: {e}")
+        raise HTTPException(status_code=500, detail=f"Error generating 30-day prediction: {str(e)}")
 
 @app.get("/advanced-prediction/{ticker}")
 def get_advanced_prediction(ticker: str, days: int = 30):
