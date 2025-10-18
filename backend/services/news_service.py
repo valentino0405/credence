@@ -80,11 +80,11 @@ class IndianNewsService:
                     seen_urls.add(article['url'])
                     unique_articles.append(article)
             
-            logger.info(f"📰 Fetched {len(unique_articles)} unique Indian financial news articles")
+            logger.info(f"Fetched {len(unique_articles)} unique Indian financial news articles")
             return unique_articles[:100]  # Limit to 100 most recent
             
         except Exception as e:
-            logger.error(f"❌ Error fetching Indian news: {e}")
+            logger.error(f"Error fetching Indian news: {e}")
             return []
 
     async def analyze_sentiment_with_gemini(self, text: str, title: str) -> Dict:
@@ -145,7 +145,7 @@ class IndianNewsService:
             }
                 
         except Exception as e:
-            logger.error(f"❌ Error in Gemini sentiment analysis: {e}")
+            logger.error(f"Error in Gemini sentiment analysis: {e}")
             # Fallback sentiment
             return {
                 "overall_sentiment": "neutral",
@@ -196,13 +196,13 @@ class IndianNewsService:
                         upsert=True
                     )
                 
-                logger.info(f"💾 Saved {len(processed_articles)} Indian news articles to database")
+                logger.info(f"Saved {len(processed_articles)} Indian news articles to database")
                 return len(processed_articles)
             
             return 0
             
         except Exception as e:
-            logger.error(f"❌ Error saving news to database: {e}")
+            logger.error(f"Error saving news to database: {e}")
             return 0
 
     async def get_latest_news_summary(self, limit: int = 20) -> Dict:
@@ -250,7 +250,7 @@ class IndianNewsService:
             }
             
         except Exception as e:
-            logger.error(f"❌ Error getting news summary: {e}")
+            logger.error(f"Error getting news summary: {e}")
             return {
                 "total_articles": 0,
                 "overall_sentiment": "neutral",

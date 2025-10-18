@@ -76,7 +76,7 @@ class TradingService:
             return portfolio_data
             
         except Exception as e:
-            logger.error(f"❌ Error getting portfolio for {user_id}: {e}")
+            logger.error(f"Error getting portfolio for {user_id}: {e}")
             return self._get_default_portfolio(user_id)
 
     async def place_buy_order(self, user_id: str, symbol: str, quantity: int) -> Dict:
@@ -117,12 +117,12 @@ class TradingService:
             trade_result = await self._execute_buy_order(user_id, symbol, quantity, current_price, trading_fee)
             
             if trade_result["success"]:
-                logger.info(f"✅ Buy order executed: {user_id} bought {quantity} shares of {symbol} at ₹{current_price}")
+                logger.info(f"Buy order executed: {user_id} bought {quantity} shares of {symbol} at ₹{current_price}")
             
             return trade_result
             
         except Exception as e:
-            logger.error(f"❌ Error placing buy order: {e}")
+            logger.error(f"Error placing buy order: {e}")
             return {"success": False, "message": str(e)}
 
     async def place_sell_order(self, user_id: str, symbol: str, quantity: int) -> Dict:
@@ -167,12 +167,12 @@ class TradingService:
             trade_result = await self._execute_sell_order(user_id, symbol, quantity, current_price, trading_fee)
             
             if trade_result["success"]:
-                logger.info(f"✅ Sell order executed: {user_id} sold {quantity} shares of {symbol} at ₹{current_price}")
+                logger.info(f"Sell order executed: {user_id} sold {quantity} shares of {symbol} at ₹{current_price}")
             
             return trade_result
             
         except Exception as e:
-            logger.error(f"❌ Error placing sell order: {e}")
+            logger.error(f"Error placing sell order: {e}")
             return {"success": False, "message": str(e)}
 
     async def _execute_buy_order(self, user_id: str, symbol: str, quantity: int, price: float, fee: float) -> Dict:
@@ -268,7 +268,7 @@ class TradingService:
             }
             
         except Exception as e:
-            logger.error(f"❌ Error executing buy order: {e}")
+            logger.error(f"Error executing buy order: {e}")
             return {"success": False, "message": str(e)}
 
     async def _execute_sell_order(self, user_id: str, symbol: str, quantity: int, price: float, fee: float) -> Dict:
@@ -348,7 +348,7 @@ class TradingService:
             }
             
         except Exception as e:
-            logger.error(f"❌ Error executing sell order: {e}")
+            logger.error(f"Error executing sell order: {e}")
             return {"success": False, "message": str(e)}
 
     async def get_trade_history(self, user_id: str, limit: int = 50) -> List[Dict]:
@@ -369,7 +369,7 @@ class TradingService:
             return trades
             
         except Exception as e:
-            logger.error(f"❌ Error getting trade history: {e}")
+            logger.error(f"Error getting trade history: {e}")
             return []
 
     async def _create_default_portfolio(self, user_id: str) -> Dict:
@@ -389,12 +389,12 @@ class TradingService:
             }
             
             await db[COLLECTIONS["user_portfolios"]].insert_one(portfolio_doc)
-            logger.info(f"✅ Created default portfolio for user {user_id}")
+            logger.info(f"Created default portfolio for user {user_id}")
             
             return portfolio_doc
             
         except Exception as e:
-            logger.error(f"❌ Error creating default portfolio: {e}")
+            logger.error(f"Error creating default portfolio: {e}")
             return self._get_default_portfolio(user_id)
 
     def _get_default_portfolio(self, user_id: str) -> Dict:
@@ -476,7 +476,7 @@ class TradingService:
             }
             
         except Exception as e:
-            logger.error(f"❌ Error calculating portfolio performance: {e}")
+            logger.error(f"Error calculating portfolio performance: {e}")
             return {}
 
     async def risk_assessment(self, user_id: str, symbol: str, quantity: int) -> Dict:
@@ -540,17 +540,17 @@ class TradingService:
             }
             
         except Exception as e:
-            logger.error(f"❌ Error in risk assessment: {e}")
+            logger.error(f"Error in risk assessment: {e}")
             return {"risk_level": "HIGH", "message": "Error assessing risk"}
 
     def _get_risk_recommendation(self, risk_level: str, risk_factors: List[str]) -> str:
         """Get risk-based recommendation"""
         if risk_level == "HIGH":
-            return "⚠️ High risk trade. Consider reducing position size or diversifying."
+            return "High risk trade. Consider reducing position size or diversifying."
         elif risk_level == "MEDIUM":
-            return "⚡ Moderate risk. Monitor position size and market conditions."
+            return "Moderate risk. Monitor position size and market conditions."
         else:
-            return "✅ Low risk trade. Good diversification opportunity."
+            return "Low risk trade. Good diversification opportunity."
 
     async def generate_trading_insights(self, user_id: str) -> Dict:
         """Generate personalized trading insights"""
@@ -563,29 +563,29 @@ class TradingService:
             
             # Portfolio analysis
             if portfolio["total_pnl_percent"] > 10:
-                insights.append("🎉 Excellent portfolio performance! You're beating market averages.")
+                insights.append("Excellent portfolio performance! You're beating market averages.")
             elif portfolio["total_pnl_percent"] < -10:
-                insights.append("📉 Portfolio underperforming. Consider reviewing your strategy.")
+                insights.append("Portfolio underperforming. Consider reviewing your strategy.")
             
             # Cash management
             cash_percent = (portfolio["cash_balance"] / portfolio["total_portfolio_value"]) * 100
             if cash_percent > 50:
-                recommendations.append("💰 High cash position. Consider investing for better returns.")
+                recommendations.append("High cash position. Consider investing for better returns.")
             elif cash_percent < 5:
-                recommendations.append("⚠️ Low cash reserves. Keep some cash for opportunities.")
+                recommendations.append("Low cash reserves. Keep some cash for opportunities.")
             
             # Diversification analysis
             holdings_count = len(portfolio["holdings"])
             if holdings_count < 3:
-                recommendations.append("🎯 Consider diversifying across more stocks to reduce risk.")
+                recommendations.append("Consider diversifying across more stocks to reduce risk.")
             elif holdings_count > 15:
-                recommendations.append("📊 High number of positions. Consider consolidating top performers.")
+                recommendations.append("High number of positions. Consider consolidating top performers.")
             
             # Performance insights
             if performance.get("win_rate", 0) < 40:
-                insights.append("🎲 Low win rate detected. Focus on better entry timing.")
+                insights.append("Low win rate detected. Focus on better entry timing.")
             elif performance.get("win_rate", 0) > 70:
-                insights.append("🏆 Great win rate! You're picking winners consistently.")
+                insights.append("Great win rate! You're picking winners consistently.")
             
             return {
                 "insights": insights,
@@ -595,7 +595,7 @@ class TradingService:
             }
             
         except Exception as e:
-            logger.error(f"❌ Error generating trading insights: {e}")
+            logger.error(f"Error generating trading insights: {e}")
             return {"insights": [], "recommendations": []}
 
     def _calculate_portfolio_score(self, portfolio: Dict, performance: Dict) -> int:

@@ -42,13 +42,13 @@ class IndianRedditService:
     async def fetch_indian_stock_discussions(self, hours_back: int = 24) -> List[Dict]:
         """Fetch Reddit discussions about Indian stocks using AsyncPRAW"""
         try:
-            logger.info(f"🔍 Fetching real Reddit discussions from last {hours_back} hours...")
+            logger.info(f"Fetching real Reddit discussions from last {hours_back} hours...")
             all_posts = []
             cutoff_time = datetime.utcnow() - timedelta(hours=hours_back)
             
             for subreddit_name in self.indian_subreddits:
                 try:
-                    logger.info(f"📡 Fetching from r/{subreddit_name}...")
+                    logger.info(f"Fetching from r/{subreddit_name}...")
                     subreddit = await self.reddit.subreddit(subreddit_name)
                     
                     # Get hot posts (async) with timeout
@@ -69,7 +69,7 @@ class IndianRedditService:
                             )
                             
                             if is_indian_stock_related:
-                                logger.info(f"📝 Found relevant post: {post.title[:50]}...")
+                                logger.info(f"Found relevant post: {post.title[:50]}...")
                                 
                                 # Get top comments (async)
                                 await post.comments.replace_more(limit=0)
@@ -106,17 +106,17 @@ class IndianRedditService:
                                     break
                             
                 except asyncio.TimeoutError:
-                    logger.warning(f"⚠️ Timeout fetching from r/{subreddit_name} after 60 seconds")
+                    logger.warning(f"Timeout fetching from r/{subreddit_name} after 60 seconds")
                     continue
                 except Exception as e:
-                    logger.warning(f"⚠️ Error fetching from r/{subreddit_name}: {e}")
+                    logger.warning(f"Error fetching from r/{subreddit_name}: {e}")
                     continue
             
-            logger.info(f"🎯 Found {len(all_posts)} real Indian stock-related Reddit posts")
+            logger.info(f"Found {len(all_posts)} real Indian stock-related Reddit posts")
             return all_posts
             
         except Exception as e:
-            logger.error(f"❌ Error fetching Reddit discussions: {e}")
+            logger.error(f"Error fetching Reddit discussions: {e}")
             return []
 
     async def analyze_reddit_sentiment(self, post: Dict) -> Dict:
@@ -158,7 +158,9 @@ class IndianRedditService:
             """
             
             response = await asyncio.to_thread(
-                self.model.generate_content, prompt
+                self.client.models.generate_content,
+                model="gemini-1.5-flash",
+                contents=prompt
             )
             
             import json
@@ -179,7 +181,7 @@ class IndianRedditService:
                 }
                 
         except Exception as e:
-            logger.error(f"❌ Error analyzing Reddit sentiment: {e}")
+            logger.error(f"Error analyzing Reddit sentiment: {e}")
             return {
                 "overall_sentiment": "neutral",
                 "confidence_score": 0.5,
@@ -196,34 +198,12 @@ class IndianRedditService:
         try:
             db = await get_database()
             collection = db[COLLECTIONS["reddit_posts"]]
-            
+
             processed_posts = []
             for post in posts:
-                    if self.client:
-                        response = await asyncio.to_thread(
-                            self.client.models.generate_content,
-                            model='gemini-1.5-pro',
-                            contents=prompt,
-                        )
-                        import json
-                        try:
-                            text_out = getattr(response, 'text', '') or ''
-                            cleaned = text_out.strip().replace('```json', '').replace('```', '')
-                            result = json.loads(cleaned)
-                            return result
-                        except Exception:
-                            pass
-                    # Fallback analysis
-                    return {
-                        "overall_sentiment": "neutral",
-                        "confidence_score": 0.5,
-                        "market_impact": "neutral",
-                        "mentioned_stocks": [],
-                        "key_themes": [],
-                        "sentiment_score": 0.0,
-                        "community_mood": "neutral",
-                        "indian_market_relevance": "medium"
-                    }
+                # Analyze sentiment for this post
+                sentiment = await self.analyze_reddit_sentiment(post)
+
                 doc = {
                     "reddit_id": post["id"],
                     "title": post["title"],
@@ -241,7 +221,7 @@ class IndianRedditService:
                     "processed": True
                 }
                 processed_posts.append(doc)
-            
+
             if processed_posts:
                 for doc in processed_posts:
                     await collection.update_one(
@@ -250,13 +230,13 @@ class IndianRedditService:
                         upsert=True
                     )
                 
-                logger.info(f"💾 Saved {len(processed_posts)} Reddit posts to database")
+                logger.info(f"Saved {len(processed_posts)} Reddit posts to database")
                 return len(processed_posts)
             
             return 0
             
         except Exception as e:
-            logger.error(f"❌ Error saving Reddit data: {e}")
+            logger.error(f"Error saving Reddit data: {e}")
             return 0
 
     async def get_reddit_sentiment_summary(self) -> Dict:
@@ -327,7 +307,7 @@ class IndianRedditService:
             }
             
         except Exception as e:
-            logger.error(f"❌ Error getting Reddit sentiment summary: {e}")
+            logger.error(f"Error getting Reddit sentiment summary: {e}")
             return {
                 "total_posts": 0,
                 "overall_sentiment": "neutral",

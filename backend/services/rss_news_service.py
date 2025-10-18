@@ -41,14 +41,14 @@ class IndianRSSNewsService:
     async def fetch_rss_news(self, hours_back: int = 24) -> List[Dict]:
         """Fetch news from RSS feeds"""
         try:
-            logger.info(f"🔄 Fetching RSS news from last {hours_back} hours...")
+            logger.info(f"Fetching RSS news from last {hours_back} hours...")
             all_articles = []
             cutoff_time = datetime.utcnow() - timedelta(hours=hours_back)
             
             async with aiohttp.ClientSession() as session:
                 for source_name, rss_url in self.rss_feeds.items():
                     try:
-                        logger.info(f"📡 Fetching from {source_name}...")
+                        logger.info(f"Fetching from {source_name}...")
                         
                         # Fetch RSS feed
                         async with session.get(rss_url, timeout=30) as response:
@@ -80,7 +80,7 @@ class IndianRSSNewsService:
                                     )
                                     
                                     if is_stock_related:
-                                        logger.info(f"📝 Found relevant article: {title[:50]}...")
+                                        logger.info(f"Found relevant article: {title[:50]}...")
                                         
                                         # Clean HTML from description
                                         clean_description = BeautifulSoup(description, 'html.parser').get_text()
@@ -101,25 +101,25 @@ class IndianRSSNewsService:
                                         all_articles.append(article)
                                         
                             else:
-                                logger.warning(f"⚠️ Failed to fetch {source_name}: HTTP {response.status}")
+                                logger.warning(f"Failed to fetch {source_name}: HTTP {response.status}")
                                 
                     except Exception as e:
-                        logger.warning(f"⚠️ Error fetching from {source_name}: {e}")
+                        logger.warning(f"Error fetching from {source_name}: {e}")
                         continue
             
-            logger.info(f"🎯 Found {len(all_articles)} relevant Indian financial news articles")
+            logger.info(f"Found {len(all_articles)} relevant Indian financial news articles")
             
             # Sort by published date (most recent first) and limit to top 5 for quick processing
             all_articles.sort(key=lambda x: x['published_at'], reverse=True)
             limited_articles = all_articles[:5]  # Process only top 5 most recent articles
             
             if len(all_articles) > 5:
-                logger.info(f"🎯 Limited to top {len(limited_articles)} most recent articles for fast processing")
+                logger.info(f"Limited to top {len(limited_articles)} most recent articles for fast processing")
             
             return limited_articles
             
         except Exception as e:
-            logger.error(f"❌ Error fetching RSS news: {e}")
+            logger.error(f"Error fetching RSS news: {e}")
             return []
 
     def _extract_image_url(self, entry) -> Optional[str]:
@@ -188,7 +188,7 @@ class IndianRSSNewsService:
                 }
                 
         except Exception as e:
-            logger.error(f"❌ Error in Gemini sentiment analysis: {e}")
+            logger.error(f"Error in Gemini sentiment analysis: {e}")
             # Fallback sentiment
             return {
                 "overall_sentiment": "neutral",
@@ -239,13 +239,13 @@ class IndianRSSNewsService:
                         upsert=True
                     )
                 
-                logger.info(f"💾 Saved {len(processed_articles)} RSS news articles to database")
+                logger.info(f"Saved {len(processed_articles)} RSS news articles to database")
                 return len(processed_articles)
             
             return 0
             
         except Exception as e:
-            logger.error(f"❌ Error saving news to database: {e}")
+            logger.error(f"Error saving news to database: {e}")
             return 0
 
     async def get_latest_news_summary(self, limit: int = 20) -> Dict:
@@ -293,7 +293,7 @@ class IndianRSSNewsService:
             }
             
         except Exception as e:
-            logger.error(f"❌ Error getting news summary: {e}")
+            logger.error(f"Error getting news summary: {e}")
             return {
                 "total_articles": 0,
                 "overall_sentiment": "neutral",

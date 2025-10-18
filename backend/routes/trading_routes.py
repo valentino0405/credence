@@ -33,7 +33,7 @@ async def get_user_portfolio(user_id: str):
             "data": portfolio
         }
     except Exception as e:
-        logger.error(f"❌ Error getting portfolio: {e}")
+        logger.error(f"Error getting portfolio: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/buy")
@@ -61,7 +61,7 @@ async def place_buy_order(order: BuyOrderRequest):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Error placing buy order: {e}")
+        logger.error(f"Error placing buy order: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/sell")
@@ -89,7 +89,7 @@ async def place_sell_order(order: SellOrderRequest):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Error placing sell order: {e}")
+        logger.error(f"Error placing sell order: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/history/{user_id}")
@@ -105,7 +105,7 @@ async def get_trade_history(user_id: str, limit: int = Query(50, ge=1, le=200)):
             }
         }
     except Exception as e:
-        logger.error(f"❌ Error getting trade history: {e}")
+        logger.error(f"Error getting trade history: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/stock/{symbol}")
@@ -118,7 +118,7 @@ async def get_stock_data(symbol: str):
             "data": stock_data
         }
     except Exception as e:
-        logger.error(f"❌ Error getting stock data: {e}")
+        logger.error(f"Error getting stock data: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/stocks/search")
@@ -134,7 +134,7 @@ async def search_stocks(q: str = Query(..., min_length=1)):
             }
         }
     except Exception as e:
-        logger.error(f"❌ Error searching stocks: {e}")
+        logger.error(f"Error searching stocks: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/performance/{user_id}")
@@ -147,7 +147,7 @@ async def get_portfolio_performance(user_id: str):
             "data": performance
         }
     except Exception as e:
-        logger.error(f"❌ Error getting portfolio performance: {e}")
+        logger.error(f"Error getting portfolio performance: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/risk-assessment")
@@ -165,7 +165,7 @@ async def assess_trade_risk(user_id: str, symbol: str, quantity: int):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Error in risk assessment: {e}")
+        logger.error(f"Error in risk assessment: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/insights/{user_id}")
@@ -178,7 +178,7 @@ async def get_trading_insights(user_id: str):
             "data": insights
         }
     except Exception as e:
-        logger.error(f"❌ Error getting trading insights: {e}")
+        logger.error(f"Error getting trading insights: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/watchlist/{user_id}")
@@ -197,14 +197,14 @@ async def get_user_watchlist(user_id: str):
             }
         }
     except Exception as e:
-        logger.error(f"❌ Error getting watchlist: {e}")
+        logger.error(f"Error getting watchlist: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/market-overview")
 async def get_market_overview():
     """Get market overview with indices and top stocks"""
     try:
-        logger.info("🏪 Getting market overview...")
+        logger.info("Getting market overview...")
         
         # Get major indices
         indices = ["^NSEI", "^BSESN"]  # NIFTY and SENSEX
@@ -214,7 +214,7 @@ async def get_market_overview():
         top_stocks = ["RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "INFY.NS", "ICICIBANK.NS"]
         stocks_data = await indian_stock_service.get_watchlist_data(top_stocks)
         
-        logger.info(f"✅ Market overview: {len(indices_data)} indices, {len(stocks_data)} stocks")
+        logger.info(f"Market overview: {len(indices_data)} indices, {len(stocks_data)} stocks")
         
         return {
             "status": "success",
@@ -226,14 +226,14 @@ async def get_market_overview():
             }
         }
     except Exception as e:
-        logger.error(f"❌ Error getting market overview: {e}")
+        logger.error(f"Error getting market overview: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/available-stocks")
 async def get_available_stocks():
     """Get all available Indian stocks for trading"""
     try:
-        logger.info("📋 Getting available Indian stocks...")
+        logger.info("Getting available Indian stocks...")
         
         # Get all available stocks with basic info
         stocks = []
@@ -244,7 +244,7 @@ async def get_available_stocks():
                 "exchange": "NSE"
             })
         
-        logger.info(f"✅ Found {len(stocks)} available stocks")
+        logger.info(f"Found {len(stocks)} available stocks")
         
         return {
             "status": "success",
@@ -254,7 +254,7 @@ async def get_available_stocks():
             }
         }
     except Exception as e:
-        logger.error(f"❌ Error getting available stocks: {e}")
+        logger.error(f"Error getting available stocks: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/search")
@@ -270,7 +270,7 @@ async def search_stocks(q: str = Query(..., min_length=1)):
             }
         }
     except Exception as e:
-        logger.error(f"❌ Error searching stocks: {e}")
+        logger.error(f"Error searching stocks: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/stock/{symbol}/chart")
@@ -287,5 +287,5 @@ async def get_stock_chart_data(symbol: str, period: str = Query("1mo", regex="^(
             }
         }
     except Exception as e:
-        logger.error(f"❌ Error getting chart data: {e}")
+        logger.error(f"Error getting chart data: {e}")
         raise HTTPException(status_code=500, detail=str(e))

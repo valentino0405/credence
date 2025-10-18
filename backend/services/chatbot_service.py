@@ -3,10 +3,13 @@ Simple Finance Chatbot Service
 Uses Gemini AI for finance questions and saves to MongoDB
 """
 import os
-from datetime import datetime
-from typing import Dict, Optional
+import asyncio
+from datetime import datetime, timedelta
+from typing import Dict, Optional, List
 import google.genai as genai
-from database.config import Database
+from database.config import get_database, COLLECTIONS
+from services.stock_data_service import IndianStockDataService
+from stock_predictor import predictor
 import logging
 
 logger = logging.getLogger(__name__)
@@ -17,10 +20,13 @@ class SimpleChatbotService:
         api_key = os.getenv('GOOGLE_API_KEY')
         if not api_key:
             raise ValueError("GOOGLE_API_KEY not found in environment variables")
-        
-    # Create client with new Google GenAI SDK
-    self.client = genai.Client(api_key=api_key)
-        
+
+        # Create client with new Google GenAI SDK
+        self.client = genai.Client(api_key=api_key)
+
+        # Initialize stock data service
+        self.indian_stock_service = IndianStockDataService()
+
         # Simple finance-focused prompt
         self.system_prompt = (
             "You are a helpful finance assistant. Answer finance-related questions clearly and concisely.\n"
@@ -31,26 +37,22 @@ class SimpleChatbotService:
             "- Technical analysis and fundamental analysis\n"
             "- Real-time market data interpretation\n"
             "- Risk assessment and portfolio management\n"
-            "- Trading strategies and market insights\n"
+            "- Trading strategies and market insights\n\n"
+            "RESPONSE FORMAT:\n"
+            "- Start with a brief, direct answer\n"
+            "- Follow with detailed analysis if needed\n"
+            "- Include relevant data points when available\n"
+            "- Suggest next steps or questions\n"
+            "- Keep responses conversational but informative\n\n"
+            "IMPORTANT GUIDELINES:\n"
+            "- Always mention this is for educational purposes\n"
+            "- Remind users that all investments carry risk\n"
+            "- Never guarantee returns or profits\n"
+            "- Encourage users to do their own research\n"
+            "- Provide balanced perspectives (bull & bear cases)\n\n"
+            "When users ask about specific stocks, offer to get real-time data and analysis. "
+            "For general questions, provide educational insights about markets, trading, and investment principles."
         )
-- Provide actionable insights
-
-📋 RESPONSE FORMAT:
-- Start with a brief, direct answer
-- Follow with detailed analysis if needed
-- Include relevant data points when available
-- Suggest next steps or questions
-- Keep responses conversational but informative
-
-🚨 IMPORTANT GUIDELINES:
-- Always mention this is for educational purposes
-- Remind users that all investments carry risk
-- Never guarantee returns or profits
-- Encourage users to do their own research
-- Provide balanced perspectives (bull & bear cases)
-
-When users ask about specific stocks, offer to get real-time data and analysis. For general questions, provide educational insights about markets, trading, and investment principles.
-"""
 
     async def send_message(self, user_id: str, message: str, context: Dict = None) -> Dict:
         """Send a message to the AI chatbot and get response"""
@@ -85,11 +87,11 @@ When users ask about specific stocks, offer to get real-time data and analysis. 
             }
             
         except Exception as e:
-            logger.error(f"❌ Error in chatbot service: {e}")
+            logger.error(f"Error in chatbot service: {e}")
             return {
                 "success": False,
                 "error": str(e),
-                "response": "I'm experiencing some technical difficulties. Please try again in a moment. 🔧"
+                "response": "I'm experiencing some technical difficulties. Please try again in a moment."
             }
 
     async def _enhance_message_with_data(self, message: str, context: Dict = None) -> tuple:
@@ -124,7 +126,7 @@ When users ask about specific stocks, offer to get real-time data and analysis. 
             for symbol in detected_stocks[:3]:  # Limit to 3 stocks to avoid overload
                 try:
                     # Get current price
-                    price_data = await indian_stock_service.get_real_time_price(symbol)
+                    price_data = await self.indian_stock_service.get_real_time_price(symbol)
                     
                     # Get AI predictions
                     prediction_data = predictor.predict_future_prices(symbol, days=7)
@@ -202,15 +204,16 @@ RESPONSE INSTRUCTIONS:
         """Generate AI response using Gemini"""
         try:
             response = await asyncio.to_thread(
-                self.model.generate_content,
-                context
+                self.client.models.generate_content,
+                model="gemini-1.5-flash",
+                contents=context
             )
-            
+
             return response.text.strip()
-            
+
         except Exception as e:
             logger.error(f"Error generating AI response: {e}")
-            return "I apologize, but I'm having trouble processing your request right now. Could you please rephrase your question? 🤖"
+            return "I apologize, but I'm having trouble processing your request right now. Could you please rephrase your question?"
 
     async def _save_conversation(self, user_id: str, user_message: str, ai_response: str, stock_data: Dict):
         """Save conversation to database"""
@@ -311,7 +314,7 @@ RESPONSE INSTRUCTIONS:
         """Get current market summary for chat context"""
         try:
             # Get key Indian market data
-            nifty_data = await indian_stock_service.get_real_time_price("^NSEI")
+            nifty_data = await self.indian_stock_service.get_real_time_price("^NSEI")
             
             market_summary = f"""
 Current Market Status:
@@ -326,4 +329,4 @@ Current Market Status:
             return "Market data temporarily unavailable"
 
 # Global chatbot service instance
-chatbot_service = StockChatbotService()
+chatbot_service = SimpleChatbotService()

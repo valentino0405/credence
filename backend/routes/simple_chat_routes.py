@@ -27,19 +27,19 @@ async def send_chat_message(chat_data: ChatMessage):
     """
     Simple endpoint: Send a finance question and get Gemini AI response
     """
-    print(f"🚀 /send endpoint called with: user_id={chat_data.user_id}, message={chat_data.message[:50]}...")
+    print(f"/send endpoint called with: user_id={chat_data.user_id}, message={chat_data.message[:50]}...")
     try:
         if not chat_data.message.strip():
             raise HTTPException(status_code=400, detail="Message cannot be empty")
         
-        print("📨 Creating SimpleChatbotService...")
+        print("Creating SimpleChatbotService...")
         chatbot = SimpleChatbotService()
-        print("📨 Calling chatbot.send_message...")
+        print("Calling chatbot.send_message...")
         result = await chatbot.send_message(
             user_id=chat_data.user_id,
             message=chat_data.message
         )
-        print(f"✅ Chatbot service returned: {result}")
+        print(f"Chatbot service returned: {result}")
         
         return ChatResponse(
             success=result["success"],

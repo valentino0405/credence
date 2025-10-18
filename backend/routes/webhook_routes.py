@@ -28,7 +28,7 @@ async def handle_clerk_webhook(request: Request):
         payload = await request.json()
         event_type = payload.get("type")
         
-        logger.info(f"🔔 Received Clerk webhook: {event_type}")
+        logger.info(f"Received Clerk webhook: {event_type}")
         
         if event_type == "user.created":
             await handle_user_created(payload["data"])
@@ -40,7 +40,7 @@ async def handle_clerk_webhook(request: Request):
         return {"status": "success", "message": f"Processed {event_type}"}
         
     except Exception as e:
-        logger.error(f"❌ Error processing Clerk webhook: {e}")
+        logger.error(f"Error processing Clerk webhook: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 async def handle_user_created(user_data):
@@ -78,20 +78,20 @@ async def handle_user_created(user_data):
         
         await db[COLLECTIONS["user_watchlists"]].insert_one(watchlist_doc)
         
-        logger.info(f"✅ Initialized portfolio for user {user_id}")
+        logger.info(f"Initialized portfolio for user {user_id}")
         
     except Exception as e:
-        logger.error(f"❌ Error initializing user portfolio: {e}")
+        logger.error(f"Error initializing user portfolio: {e}")
 
 async def handle_user_updated(user_data):
     """Handle user profile updates"""
     try:
         user_id = user_data.get("id")
         # Update user profile data if needed
-        logger.info(f"📝 Updated user profile: {user_id}")
+        logger.info(f"Updated user profile: {user_id}")
         
     except Exception as e:
-        logger.error(f"❌ Error updating user: {e}")
+        logger.error(f"Error updating user: {e}")
 
 async def handle_user_deleted(user_data):
     """Clean up user data when account is deleted"""
@@ -109,7 +109,7 @@ async def handle_user_deleted(user_data):
         # Delete user watchlist
         await db[COLLECTIONS["user_watchlists"]].delete_one({"user_id": user_id})
         
-        logger.info(f"🗑️ Cleaned up data for deleted user: {user_id}")
+        logger.info(f"Cleaned up data for deleted user: {user_id}")
         
     except Exception as e:
-        logger.error(f"❌ Error cleaning up user data: {e}")
+        logger.error(f"Error cleaning up user data: {e}")

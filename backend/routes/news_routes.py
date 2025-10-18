@@ -110,7 +110,7 @@ async def get_indian_market_sentiment():
         }
         
     except Exception as e:
-        logger.error(f"❌ Error getting market sentiment: {e}")
+        logger.error(f"Error getting market sentiment: {e}")
         # Return demo data on error
         return {
             "status": "success",
@@ -153,7 +153,7 @@ async def get_latest_indian_news(limit: int = 20):
         }
         
     except Exception as e:
-        logger.error(f"❌ Error getting latest news: {e}")
+        logger.error(f"Error getting latest news: {e}")
         raise HTTPException(status_code=500, detail=f"Error fetching news: {str(e)}")
 
 @router.get("/reddit-sentiment")
@@ -188,7 +188,7 @@ async def get_reddit_indian_sentiment():
         }
         
     except Exception as e:
-        logger.error(f"❌ Error getting Reddit sentiment: {e}")
+        logger.error(f"Error getting Reddit sentiment: {e}")
         raise HTTPException(status_code=500, detail=f"Error fetching Reddit sentiment: {str(e)}")
 
 @router.post("/refresh-news")
@@ -204,7 +204,7 @@ async def refresh_indian_news(background_tasks: BackgroundTasks):
         }
         
     except Exception as e:
-        logger.error(f"❌ Error starting news refresh: {e}")
+        logger.error(f"Error starting news refresh: {e}")
         raise HTTPException(status_code=500, detail=f"Error starting refresh: {str(e)}")
 
 @router.post("/refresh-reddit")
@@ -228,21 +228,21 @@ async def refresh_reddit_data(background_tasks: BackgroundTasks):
         }
         
     except Exception as e:
-        logger.error(f"❌ Error starting Reddit refresh: {e}")
+        logger.error(f"Error starting Reddit refresh: {e}")
         raise HTTPException(status_code=500, detail=f"Error starting refresh: {str(e)}")
 
 @router.post("/populate-sample-data")
 async def populate_sample_data():
     """Populate database with sample Indian market news data"""
     try:
-        logger.info("🔄 Starting to populate sample data...")
+        logger.info("Starting to populate sample data...")
         
         # Fetch real news
         articles = await indian_news_service.fetch_indian_financial_news(hours_back=48)
         
         if articles:
             saved_count = await indian_news_service.save_news_to_db(articles)
-            logger.info(f"💾 Saved {saved_count} articles to database")
+            logger.info(f"Saved {saved_count} articles to database")
             
             return {
                 "status": "success",
@@ -261,7 +261,7 @@ async def populate_sample_data():
             }
         
     except Exception as e:
-        logger.error(f"❌ Error populating sample data: {e}")
+        logger.error(f"Error populating sample data: {e}")
         raise HTTPException(status_code=500, detail=f"Error populating data: {str(e)}")
 
 @router.get("/debug-db")
@@ -290,14 +290,14 @@ async def debug_database():
         }
         
     except Exception as e:
-        logger.error(f"❌ Error in debug endpoint: {e}")
+        logger.error(f"Error in debug endpoint: {e}")
         raise HTTPException(status_code=500, detail=f"Debug error: {str(e)}")
 
 @router.get("/test-reddit")
 async def test_reddit_connection():
     """Test Reddit API connection"""
     try:
-        logger.info("🔄 Testing Reddit API connection...")
+        logger.info("Testing Reddit API connection...")
         
         # Try to fetch just one post from IndiaInvestments to test connection
         subreddit = await indian_reddit_service.reddit.subreddit("IndiaInvestments")
@@ -326,7 +326,7 @@ async def test_reddit_connection():
             }
         
     except Exception as e:
-        logger.error(f"❌ Error testing Reddit connection: {e}")
+        logger.error(f"Error testing Reddit connection: {e}")
         return {
             "status": "error",
             "message": f"Reddit API connection failed: {str(e)}",
@@ -337,7 +337,7 @@ async def test_reddit_connection():
 async def fetch_rss_news():
     """Fetch real-time Indian financial news from RSS feeds"""
     try:
-        logger.info("🔄 Fetching real-time RSS news...")
+        logger.info("Fetching real-time RSS news...")
         
         # Clear existing mock data first
         db = await get_database()
@@ -363,14 +363,14 @@ async def fetch_rss_news():
         }
         
     except Exception as e:
-        logger.error(f"❌ Error fetching RSS news: {e}")
+        logger.error(f"Error fetching RSS news: {e}")
         raise HTTPException(status_code=500, detail=f"Error fetching RSS news: {str(e)}")
 
 @router.post("/fetch-real-data")
 async def fetch_real_data():
     """Fetch real-time data from NewsAPI and Reddit"""
     try:
-        logger.info("🔄 Fetching real-time data from APIs...")
+        logger.info("Fetching real-time data from APIs...")
         
         # Clear existing mock data first
         db = await get_database()
@@ -406,14 +406,14 @@ async def fetch_real_data():
         }
         
     except Exception as e:
-        logger.error(f"❌ Error fetching real data: {e}")
+        logger.error(f"Error fetching real data: {e}")
         raise HTTPException(status_code=500, detail=f"Error fetching real data: {str(e)}")
 
 @router.post("/populate-mock-data")
 async def populate_mock_data():
     """Populate database with mock Indian market data for testing"""
     try:
-        logger.info("🔄 Populating mock data for testing...")
+        logger.info("Populating mock data for testing...")
         
         # Generate mock data
         from generate_mock_data import generate_mock_indian_news, generate_mock_reddit_posts
@@ -444,7 +444,7 @@ async def populate_mock_data():
                     upsert=True
                 )
         
-        logger.info(f"💾 Saved {len(mock_articles)} mock articles and {len(mock_reddit)} mock Reddit posts")
+        logger.info(f"Saved {len(mock_articles)} mock articles and {len(mock_reddit)} mock Reddit posts")
         
         return {
             "status": "success",
@@ -455,7 +455,7 @@ async def populate_mock_data():
         }
         
     except Exception as e:
-        logger.error(f"❌ Error populating mock data: {e}")
+        logger.error(f"Error populating mock data: {e}")
         raise HTTPException(status_code=500, detail=f"Error populating mock data: {str(e)}")
 
 @router.get("/sentiment-history")
@@ -511,26 +511,26 @@ async def get_sentiment_history(days: int = 7):
         }
         
     except Exception as e:
-        logger.error(f"❌ Error getting sentiment history: {e}")
+        logger.error(f"Error getting sentiment history: {e}")
         raise HTTPException(status_code=500, detail=f"Error fetching sentiment history: {str(e)}")
 
 # Background task functions
 async def fetch_and_process_news():
     """Background task to fetch and process news"""
     try:
-        logger.info("🔄 Starting news fetch background task...")
+        logger.info("Starting news fetch background task...")
         articles = await indian_news_service.fetch_indian_financial_news(hours_back=24)
         saved_count = await indian_news_service.save_news_to_db(articles)
-        logger.info(f"✅ Background news task completed: {saved_count} articles processed")
+        logger.info(f"Background news task completed: {saved_count} articles processed")
     except Exception as e:
-        logger.error(f"❌ Background news task failed: {e}")
+        logger.error(f"Background news task failed: {e}")
 
 async def fetch_and_process_reddit():
     """Background task to fetch and process Reddit data"""
     try:
-        logger.info("🔄 Starting Reddit fetch background task...")
+        logger.info("Starting Reddit fetch background task...")
         posts = await indian_reddit_service.fetch_indian_stock_discussions(hours_back=24)
         saved_count = await indian_reddit_service.save_reddit_data_to_db(posts)
-        logger.info(f"✅ Background Reddit task completed: {saved_count} posts processed")
+        logger.info(f"Background Reddit task completed: {saved_count} posts processed")
     except Exception as e:
-        logger.error(f"❌ Background Reddit task failed: {e}")
+        logger.error(f"Background Reddit task failed: {e}")

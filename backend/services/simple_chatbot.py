@@ -30,17 +30,17 @@ class SimpleChatbotService:
         Simple chat function: question -> Gemini -> save to DB -> return answer
         """
         try:
-            print(f"🤖 SimpleChatbotService.send_message called with user_id: {user_id}, message: {message[:100]}...")
+            print(f"SimpleChatbotService.send_message called with user_id: {user_id}, message: {message[:100]}...")
             
             # Generate response using new Gemini API
             full_prompt = f"{self.system_prompt}\n\nUser question: {message}"
-            print("🔮 Calling Gemini API...")
+            print("Calling Gemini API...")
             
             response = self.client.models.generate_content(
                 model='gemini-2.0-flash-exp',
                 contents=full_prompt
             )
-            print(f"✅ Gemini API response received: {str(response)[:200]}...")
+            print(f"Gemini API response received: {str(response)[:200]}...")
             
             ai_response = response.text if hasattr(response, 'text') and response.text else "Sorry, I couldn't process that question."
             

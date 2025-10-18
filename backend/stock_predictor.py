@@ -102,7 +102,7 @@ class StockPredictor:
                         'SP500': sp500_data.values.flatten()
                     })
                     df = df.merge(spy_df, on='Date', how='left')
-                    logger.info("✅ Successfully fetched S&P500 data using SPY!")
+                    logger.info("Successfully fetched S&P500 data using SPY!")
                     sp500_obtained = True
                 else:
                     raise ValueError("SPY data empty")
@@ -120,7 +120,7 @@ class StockPredictor:
                             'SP500': sp500_close.values.flatten()
                         })
                         df = df.merge(gspc_df, on='Date', how='left')
-                        logger.info("✅ Successfully fetched S&P500 data using ^GSPC!")
+                        logger.info("Successfully fetched S&P500 data using ^GSPC!")
                         sp500_obtained = True
                     else:
                         raise ValueError("^GSPC data empty")
@@ -129,7 +129,7 @@ class StockPredictor:
             
             # If all S&P500 methods failed, use smart synthetic data
             if not sp500_obtained:
-                logger.info("🔄 Using smart synthetic S&P500 data (market-correlated)")
+                logger.info("Using smart synthetic S&P500 data (market-correlated)")
                 # Base S&P500 around 4500, with some realistic variance
                 base_sp500 = 4500
                 try:
@@ -152,7 +152,7 @@ class StockPredictor:
                         'VIX': vix_close.values.flatten()
                     })
                     df = df.merge(vix_df, on='Date', how='left')
-                    logger.info("✅ Successfully fetched VIX data using ^VIX!")
+                    logger.info("Successfully fetched VIX data using ^VIX!")
                     vix_obtained = True
                 else:
                     raise ValueError("^VIX data empty")
@@ -174,7 +174,7 @@ class StockPredictor:
                             'VIX': vix_scaled.values.flatten()
                         })
                         df = df.merge(vixy_df, on='Date', how='left')
-                        logger.info("✅ Successfully fetched VIX data using VIXY (scaled)!")
+                        logger.info("Successfully fetched VIX data using VIXY (scaled)!")
                         vix_obtained = True
                     else:
                         raise ValueError("VIXY data empty")
@@ -183,7 +183,7 @@ class StockPredictor:
             
             # If all VIX methods failed, use smart synthetic data
             if not vix_obtained:
-                logger.info("🔄 Using smart synthetic VIX data (volatility-correlated)")
+                logger.info("Using smart synthetic VIX data (volatility-correlated)")
                 try:
                     # Calculate stock volatility and map to VIX-like values
                     stock_returns = df['Close'].pct_change()

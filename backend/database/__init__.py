@@ -27,10 +27,10 @@ async def init_database():
         await db["reddit_indian_stocks"].create_index("created_at")
         await db["reddit_indian_stocks"].create_index("market_region")
         
-        logger.info("✅ Database initialized successfully")
+        logger.info("Database initialized successfully")
         
     except Exception as e:
-        logger.error(f"❌ Database initialization failed: {e}")
+        logger.error(f"Database initialization failed: {e}")
         raise
 
 if __name__ == "__main__":

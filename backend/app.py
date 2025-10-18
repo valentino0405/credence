@@ -28,19 +28,19 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     """Manage application lifecycle"""
     # Startup
-    logger.info("🚀 Starting Credence AI Trading API...")
+    logger.info("Starting Credence AI Trading API...")
     try:
         await Database.connect()
         Database.connect_sync()
-        logger.info("✅ Database connections established")
+        logger.info("Database connections established")
     except Exception as e:
-        logger.warning(f"⚠️ Database connection failed: {e}")
-        logger.info("🔄 Running in offline mode (basic functionality only)")
+        logger.warning(f"Database connection failed: {e}")
+        logger.info("Running in offline mode (basic functionality only)")
     
     yield
     
     # Shutdown
-    logger.info("🔌 Shutting down...")
+    logger.info("Shutting down...")
     try:
         await Database.disconnect()
     except:

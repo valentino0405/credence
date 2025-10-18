@@ -90,13 +90,13 @@ class IndianStockDataService:
     async def get_real_time_price(self, symbol: str) -> Dict:
         """Get real-time stock price"""
         try:
-            logger.info(f"📊 Getting live price for {symbol}")
+            logger.info(f"Getting live price for {symbol}")
             # Use thread executor to avoid blocking
             stock_data = await asyncio.to_thread(self._fetch_stock_data, symbol)
             return stock_data
             
         except Exception as e:
-            logger.error(f"❌ Error fetching price for {symbol}: {e}")
+            logger.error(f"Error fetching price for {symbol}: {e}")
             return self._get_mock_price(symbol)
 
     def _fetch_stock_data(self, symbol: str) -> Dict:
@@ -132,7 +132,7 @@ class IndianStockDataService:
             }
             
         except Exception as e:
-            logger.warning(f"⚠️ yfinance failed for {symbol}, using mock data: {e}")
+            logger.warning(f"yfinance failed for {symbol}, using mock data: {e}")
             return self._get_mock_price(symbol)
 
     def _get_mock_price(self, symbol: str) -> Dict:
@@ -172,7 +172,7 @@ class IndianStockDataService:
             return hist_data
             
         except Exception as e:
-            logger.error(f"❌ Error fetching historical data for {symbol}: {e}")
+            logger.error(f"Error fetching historical data for {symbol}: {e}")
             return []
 
     def _fetch_historical_data(self, symbol: str, period: str) -> List[Dict]:
@@ -198,13 +198,13 @@ class IndianStockDataService:
             return data
             
         except Exception as e:
-            logger.error(f"❌ Error in _fetch_historical_data: {e}")
+            logger.error(f"Error in _fetch_historical_data: {e}")
             return []
 
     async def get_watchlist_data(self, symbols: List[str]) -> List[Dict]:
         """Get real-time data for multiple stocks"""
         try:
-            logger.info(f"📋 Fetching watchlist data for {len(symbols)} symbols")
+            logger.info(f"Fetching watchlist data for {len(symbols)} symbols")
             valid_results = []
             
             for symbol in symbols:
@@ -212,14 +212,14 @@ class IndianStockDataService:
                     result = await self.get_real_time_price(symbol)
                     valid_results.append(result)
                 except Exception as e:
-                    logger.warning(f"⚠️ Error fetching {symbol}: {e}")
+                    logger.warning(f"Error fetching {symbol}: {e}")
                     continue
             
-            logger.info(f"✅ Successfully fetched {len(valid_results)} stock prices")
+            logger.info(f"Successfully fetched {len(valid_results)} stock prices")
             return valid_results
             
         except Exception as e:
-            logger.error(f"❌ Error fetching watchlist data: {e}")
+            logger.error(f"Error fetching watchlist data: {e}")
             return []
 
     async def search_stocks(self, query: str) -> List[Dict]:
@@ -239,7 +239,7 @@ class IndianStockDataService:
             return matches
             
         except Exception as e:
-            logger.error(f"❌ Error searching stocks: {e}")
+            logger.error(f"Error searching stocks: {e}")
             return []
 
     async def save_stock_prices_to_db(self, stock_data: List[Dict]):
@@ -258,10 +258,10 @@ class IndianStockDataService:
                     upsert=True
                 )
             
-            logger.info(f"💾 Saved {len(stock_data)} stock prices to database")
+            logger.info(f"Saved {len(stock_data)} stock prices to database")
             
         except Exception as e:
-            logger.error(f"❌ Error saving stock prices: {e}")
+            logger.error(f"Error saving stock prices: {e}")
 
 # Global instance
 indian_stock_service = IndianStockDataService()

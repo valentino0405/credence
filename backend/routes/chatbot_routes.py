@@ -50,7 +50,7 @@ async def send_chat_message(request: ChatMessageRequest):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Error in chat message: {e}")
+        logger.error(f"Error in chat message: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/history/{user_id}")
@@ -73,7 +73,7 @@ async def get_chat_history(
         }
         
     except Exception as e:
-        logger.error(f"❌ Error getting chat history: {e}")
+        logger.error(f"Error getting chat history: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/analyze-stock")
@@ -118,7 +118,7 @@ async def analyze_stock_with_ai(request: ChatAnalysisRequest):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Error in stock analysis: {e}")
+        logger.error(f"Error in stock analysis: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/market-insights/{user_id}")
@@ -163,7 +163,7 @@ async def get_market_insights(user_id: str):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Error getting market insights: {e}")
+        logger.error(f"Error getting market insights: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/portfolio-analysis")
@@ -205,7 +205,7 @@ async def analyze_portfolio_with_ai(user_id: str):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Error in portfolio analysis: {e}")
+        logger.error(f"Error in portfolio analysis: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/suggested-questions")
@@ -269,7 +269,7 @@ async def get_suggested_questions():
         }
         
     except Exception as e:
-        logger.error(f"❌ Error getting suggested questions: {e}")
+        logger.error(f"Error getting suggested questions: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.delete("/history/{user_id}")
@@ -286,5 +286,5 @@ async def clear_chat_history(user_id: str):
         }
         
     except Exception as e:
-        logger.error(f"❌ Error clearing chat history: {e}")
+        logger.error(f"Error clearing chat history: {e}")
         raise HTTPException(status_code=500, detail=str(e))
