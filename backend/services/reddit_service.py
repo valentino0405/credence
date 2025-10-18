@@ -5,7 +5,7 @@ import os
 import asyncio
 import asyncpraw
 from datetime import datetime, timedelta
-import google.generativeai as genai
+import google.genai as genai
 from database.config import get_database, COLLECTIONS
 import logging
 from typing import List, Dict
@@ -20,8 +20,8 @@ class IndianRedditService:
             user_agent=os.getenv('REDDIT_USER_AGENT'),
             timeout=30  # 30 second timeout
         )
-        genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
-        self.model = genai.GenerativeModel('gemini-1.5-pro')
+        api_key = os.getenv('GOOGLE_API_KEY') or os.getenv('GEMINI_API_KEY')
+        self.client = genai.Client(api_key=api_key) if api_key else None
         
         # Indian stock-focused subreddits and keywords
         self.indian_subreddits = [
@@ -199,9 +199,31 @@ class IndianRedditService:
             
             processed_posts = []
             for post in posts:
-                # Analyze sentiment
-                sentiment = await self.analyze_reddit_sentiment(post)
-                
+                    if self.client:
+                        response = await asyncio.to_thread(
+                            self.client.models.generate_content,
+                            model='gemini-1.5-pro',
+                            contents=prompt,
+                        )
+                        import json
+                        try:
+                            text_out = getattr(response, 'text', '') or ''
+                            cleaned = text_out.strip().replace('```json', '').replace('```', '')
+                            result = json.loads(cleaned)
+                            return result
+                        except Exception:
+                            pass
+                    # Fallback analysis
+                    return {
+                        "overall_sentiment": "neutral",
+                        "confidence_score": 0.5,
+                        "market_impact": "neutral",
+                        "mentioned_stocks": [],
+                        "key_themes": [],
+                        "sentiment_score": 0.0,
+                        "community_mood": "neutral",
+                        "indian_market_relevance": "medium"
+                    }
                 doc = {
                     "reddit_id": post["id"],
                     "title": post["title"],

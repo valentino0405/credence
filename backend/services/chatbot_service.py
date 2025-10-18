@@ -5,7 +5,7 @@ Uses Gemini AI for finance questions and saves to MongoDB
 import os
 from datetime import datetime
 from typing import Dict, Optional
-import google.generativeai as genai
+import google.genai as genai
 from database.config import Database
 import logging
 
@@ -18,26 +18,21 @@ class SimpleChatbotService:
         if not api_key:
             raise ValueError("GOOGLE_API_KEY not found in environment variables")
         
-        genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel('gemini-pro')
+    # Create client with new Google GenAI SDK
+    self.client = genai.Client(api_key=api_key)
         
         # Simple finance-focused prompt
-        self.system_prompt = """You are a helpful finance assistant. Answer finance-related questions clearly and concisely. 
-        Focus on: stocks, trading, investments, market analysis, financial planning.
-        Keep responses informative but easy to understand.
-        
-        CORE EXPERTISE:
-        - Indian stock markets (NSE/BSE) and global markets
-        - Technical analysis and fundamental analysis  
-        - Real-time market data interpretation
-        - Risk assessment and portfolio management
-        - Trading strategies and market insights"""
-
-🎯 PERSONALITY:
-- Professional yet approachable
-- Data-driven and analytical
-- Clear, concise explanations
-- Use relevant emojis for visual appeal
+        self.system_prompt = (
+            "You are a helpful finance assistant. Answer finance-related questions clearly and concisely.\n"
+            "Focus on: stocks, trading, investments, market analysis, financial planning.\n"
+            "Keep responses informative but easy to understand.\n\n"
+            "CORE EXPERTISE:\n"
+            "- Indian stock markets (NSE/BSE) and global markets\n"
+            "- Technical analysis and fundamental analysis\n"
+            "- Real-time market data interpretation\n"
+            "- Risk assessment and portfolio management\n"
+            "- Trading strategies and market insights\n"
+        )
 - Provide actionable insights
 
 📋 RESPONSE FORMAT:

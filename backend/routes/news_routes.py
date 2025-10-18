@@ -6,7 +6,10 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks
 from datetime import datetime
 from services.news_service import indian_news_service
 from services.rss_news_service import indian_rss_news_service
-from services.reddit_service import indian_reddit_service
+try:
+    from services.reddit_service import indian_reddit_service
+except Exception:
+    indian_reddit_service = None  # Optional dependency; fall back to demo data
 from database.config import get_database, COLLECTIONS
 import logging
 
@@ -55,7 +58,18 @@ async def get_indian_market_sentiment():
         
         # Get real data if database is available
         news_summary = await indian_news_service.get_latest_news_summary(limit=50)
-        reddit_summary = await indian_reddit_service.get_reddit_sentiment_summary()
+        if indian_reddit_service:
+            reddit_summary = await indian_reddit_service.get_reddit_sentiment_summary()
+        else:
+            reddit_summary = {
+                "total_posts": 0,
+                "overall_sentiment": "neutral",
+                "sentiment_breakdown": {"bullish": 0, "bearish": 0, "neutral": 0},
+                "top_mentioned_stocks": [],
+                "posts_sample": [],
+                "last_updated": datetime.utcnow().isoformat(),
+                "note": "Reddit service unavailable"
+            }
         
         # Combine sentiments for overall score
         news_positive = news_summary["sentiment_breakdown"]["positive"]
@@ -146,6 +160,26 @@ async def get_latest_indian_news(limit: int = 20):
 async def get_reddit_indian_sentiment():
     """Get Reddit sentiment analysis for Indian stocks"""
     try:
+        # Check if Reddit service is available
+        if indian_reddit_service is None:
+            # Return demo data when Reddit service not configured
+            return {
+                "status": "success",
+                "data": {
+                    "total_posts": 8,
+                    "overall_sentiment": "bullish",
+                    "sentiment_breakdown": {"bullish": 5, "bearish": 1, "neutral": 2},
+                    "top_mentioned_stocks": [
+                        {"stock": "RELIANCE", "mentions": 12},
+                        {"stock": "TCS", "mentions": 8},
+                        {"stock": "INFY", "mentions": 6}
+                    ],
+                    "posts_sample": [],
+                    "last_updated": datetime.utcnow().isoformat(),
+                    "note": "Demo data - Reddit credentials not configured"
+                }
+            }
+        
         reddit_summary = await indian_reddit_service.get_reddit_sentiment_summary()
         
         return {
@@ -177,6 +211,14 @@ async def refresh_indian_news(background_tasks: BackgroundTasks):
 async def refresh_reddit_data(background_tasks: BackgroundTasks):
     """Refresh Reddit sentiment data (background task)"""
     try:
+        # Check if Reddit service is available
+        if indian_reddit_service is None:
+            return {
+                "status": "info",
+                "message": "Reddit service not configured - using demo data",
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        
         background_tasks.add_task(fetch_and_process_reddit)
         
         return {

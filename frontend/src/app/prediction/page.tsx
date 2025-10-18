@@ -76,11 +76,11 @@ const PredictionPage: React.FC = () => {
     try {
       if (predictionType === 'extended' && selectedDays === 30) {
         // Use extended 30-day prediction API
-        const response = await fetch(`${API_BASE_URL}/extended-prediction/${ticker}`);
+  const response = await fetch(`${API_BASE_URL}/extended-prediction/${ticker}`);
         if (!response.ok) throw new Error('Failed to fetch extended predictions');
         
-        const data = await response.json();
-        setExtendedData(data);
+  const data = await response.json();
+  setExtendedData(data);
         setPredictionData(null);
       } else {
         // Use standard prediction API
@@ -88,8 +88,21 @@ const PredictionPage: React.FC = () => {
         if (!response.ok) throw new Error('Failed to fetch predictions');
         
         const data = await response.json();
-        setPredictionData(data.predictions);
-        setAccuracyData(data.accuracy_metrics);
+        // Backend returns detailed structure; normalize to match component expectations
+        const detailed = data.detailed_predictions || data;
+        const base = detailed?.prediction_scenarios?.base || {};
+        const preds = detailed?.predictions || base?.predictions || detailed?.future_predictions || [];
+        setPredictionData({
+          ticker: (data.summary?.ticker || '').toString() || ticker,
+          current_price: detailed.current_price || 0,
+          predictions: preds.map((p: any, idx: number) => ({
+            date: p.date || p.timestamp || '',
+            predicted_price: p.predicted_price || p.target_price || p.price || 0,
+            days_ahead: p.days_ahead ?? idx + 1,
+            confidence_level: p.confidence || p.confidence_level
+          }))
+        } as any);
+        setAccuracyData(data.accuracy_metrics || data.model_accuracy || null);
         setExtendedData(null);
       }
     } catch (err) {
@@ -461,25 +474,25 @@ const PredictionPage: React.FC = () => {
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-white/70">Avg Error:</span>
-                    <span className="font-semibold text-white">{accuracyData.mean_absolute_percentage_error.toFixed(2)}%</span>
+                    <span className="font-semibold text-white">{accuracyData?.mean_absolute_percentage_error?.toFixed(2) ?? 'N/A'}%</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-white/70">Median Error:</span>
-                    <span className="font-semibold text-white">{accuracyData.median_absolute_percentage_error.toFixed(2)}%</span>
+                    <span className="font-semibold text-white">{accuracyData?.median_absolute_percentage_error?.toFixed(2) ?? 'N/A'}%</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-white/70">R² Score:</span>
-                    <span className="font-semibold text-white">{accuracyData.r2_score.toFixed(3)}</span>
+                    <span className="font-semibold text-white">{accuracyData?.r2_score?.toFixed(3) ?? 'N/A'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-white/70">Accuracy:</span>
                     <span className="font-semibold text-emerald-400">
-                      ~{(100 - accuracyData.mean_absolute_percentage_error).toFixed(1)}%
+                      ~{accuracyData?.mean_absolute_percentage_error ? (100 - accuracyData.mean_absolute_percentage_error).toFixed(1) : 'N/A'}%
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-white/70">Test Period:</span>
-                    <span className="font-semibold text-white">{accuracyData.accuracy_period_days} days</span>
+                    <span className="font-semibold text-white">{accuracyData?.accuracy_period_days ?? 'N/A'} days</span>
                   </div>
                 </div>
               </div>

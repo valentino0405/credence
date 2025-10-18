@@ -27,10 +27,16 @@ const MarketPage: React.FC = () => {
       try {
         // Fetch current stock data
         const stockResponse = await fetch(`${API_BASE_URL}/candlestick-data?ticker=${ticker}`);
+        if (!stockResponse.ok) {
+          throw new Error(`Stock fetch failed ${stockResponse.status} ${stockResponse.statusText}`);
+        }
         const stockData = await stockResponse.json();
         
         // Fetch AI prediction
         const aiResponse = await fetch(`${API_BASE_URL}/ai-prediction/${ticker}`);
+        if (!aiResponse.ok) {
+          throw new Error(`AI fetch failed ${aiResponse.status} ${aiResponse.statusText}`);
+        }
         const aiData = await aiResponse.json();
         
         return {

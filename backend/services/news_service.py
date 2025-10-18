@@ -1,21 +1,14 @@
 """
 Indian News API Service
-Fetches and proce            # Query 1: General Indian market news
-            market_news = self.news_api.get_everything(
-                q='Indian stock market OR NIFTY OR SENSEX OR BSE OR NSE',
-                sources=','.join(self.indian_sources),
-                language='en',
-                from_param=from_date.strftime('%Y-%m-%d'),
-                to=to_date.strftime('%Y-%m-%d'),
-                sort_by='publishedAt',
-                page_size=50
-            )n financial news
+Fetches and processes Indian financial news, performs sentiment analysis
+using Google Gemini when available (google.genai), and falls back to
+TextBlob when the API key is not configured.
 """
 import os
 import asyncio
 from datetime import datetime, timedelta
 from newsapi import NewsApiClient
-import google.generativeai as genai
+import google.genai as genai
 from textblob import TextBlob
 from database.config import get_database, COLLECTIONS
 import logging
@@ -26,8 +19,9 @@ logger = logging.getLogger(__name__)
 class IndianNewsService:
     def __init__(self):
         self.news_api = NewsApiClient(api_key=os.getenv('NEWSAPI_KEY'))
-        genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
-        self.model = genai.GenerativeModel('gemini-1.5-pro')
+        # Support both GOOGLE_API_KEY and GEMINI_API_KEY env names
+        api_key = os.getenv('GOOGLE_API_KEY') or os.getenv('GEMINI_API_KEY')
+        self.client = genai.Client(api_key=api_key) if api_key else None
         
         # Indian financial news sources
         self.indian_sources = [
@@ -116,27 +110,39 @@ class IndianNewsService:
             Focus on Indian stocks, NIFTY/SENSEX impact, RBI policies, Indian companies, and rupee implications.
             """
             
-            response = await asyncio.to_thread(
-                self.model.generate_content, prompt
-            )
-            
-            # Extract JSON from response
-            import json
-            try:
-                result = json.loads(response.text.strip().replace('```json', '').replace('```', ''))
-                return result
-            except:
-                # Fallback to TextBlob if Gemini fails
-                blob = TextBlob(text)
-                return {
-                    "overall_sentiment": "positive" if blob.sentiment.polarity > 0.1 else "negative" if blob.sentiment.polarity < -0.1 else "neutral",
-                    "confidence_score": abs(blob.sentiment.polarity),
-                    "market_impact": "bullish" if blob.sentiment.polarity > 0 else "bearish" if blob.sentiment.polarity < 0 else "neutral",
-                    "key_entities": [],
-                    "impact_score": abs(blob.sentiment.polarity),
-                    "reasoning": "Fallback TextBlob analysis",
-                    "indian_context": "General sentiment analysis"
-                }
+            if self.client:
+                response = await asyncio.to_thread(
+                    self.client.models.generate_content,
+                    model='gemini-1.5-pro',
+                    contents=prompt,
+                )
+                # Extract JSON from response
+                import json
+                text_out = getattr(response, "text", None)
+                if not text_out:
+                    # Try to traverse candidates if .text is unavailable
+                    try:
+                        text_out = response.candidates[0].content.parts[0].text  # type: ignore[attr-defined]
+                    except Exception:
+                        text_out = ""
+                try:
+                    cleaned = text_out.strip().replace('```json', '').replace('```', '')
+                    result = json.loads(cleaned)
+                    return result
+                except Exception:
+                    pass  # fall through to TextBlob fallback
+
+            # Fallback to TextBlob if Gemini not configured or parsing failed
+            blob = TextBlob(text)
+            return {
+                "overall_sentiment": "positive" if blob.sentiment.polarity > 0.1 else "negative" if blob.sentiment.polarity < -0.1 else "neutral",
+                "confidence_score": abs(blob.sentiment.polarity),
+                "market_impact": "bullish" if blob.sentiment.polarity > 0 else "bearish" if blob.sentiment.polarity < 0 else "neutral",
+                "key_entities": [],
+                "impact_score": abs(blob.sentiment.polarity),
+                "reasoning": "Fallback TextBlob analysis",
+                "indian_context": "General sentiment analysis"
+            }
                 
         except Exception as e:
             logger.error(f"❌ Error in Gemini sentiment analysis: {e}")

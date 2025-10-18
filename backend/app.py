@@ -17,7 +17,7 @@ from database.config import Database
 from routes.news_routes import router as news_router
 from routes.webhook_routes import router as webhook_router
 from routes.trading_routes import router as trading_router
-from routes.chatbot_routes import router as chatbot_router
+# from routes.chatbot_routes import router as chatbot_router  # Disabled until chatbot_service cleaned
 from routes.simple_chat_routes import router as simple_chat_router
 
 # Configure logging
@@ -68,7 +68,7 @@ app.add_middleware(
 app.include_router(news_router)
 app.include_router(webhook_router)
 app.include_router(trading_router)
-# app.include_router(chatbot_router)  # Temporarily disabled
+# app.include_router(chatbot_router)  # Keep disabled for now
 app.include_router(simple_chat_router)
 
 @app.get("/")
@@ -316,15 +316,27 @@ def get_advanced_prediction(ticker: str, days: int = 30):
         # Get enhanced predictions with scenarios
         predictions = predictor.predict_future_prices(ticker, days=days)
         
-        # Get prediction summary for easier consumption
-        summary = predictor.get_extended_prediction_summary(ticker, days=days)
-        
         # Get accuracy metrics
         accuracy = predictor.get_prediction_accuracy(ticker)
         
+        # Build summary from predictions
+        current_price = predictions.get("current_price", 0)
+        base = predictions.get("prediction_scenarios", {}).get("base", {})
+        base_predictions = base.get("predictions", [])
+        final_price = base_predictions[-1]["predicted_price"] if base_predictions else current_price
+        
+        summary = {
+            "ticker": ticker.upper(),
+            "current_price": current_price,
+            "prediction_horizon": days,
+            "trend_direction": "Bullish" if final_price > current_price else "Bearish",
+            "total_expected_change": round(((final_price - current_price) / current_price) * 100, 2) if current_price else 0
+        }
+        
         return {
             "status": "success",
-            "summary": summary.get("summary", {}),
+            "summary": summary,
+            "predictions": predictions,
             "detailed_predictions": predictions,
             "accuracy_metrics": accuracy,
             "features": {
@@ -338,6 +350,40 @@ def get_advanced_prediction(ticker: str, days: int = 30):
         
     except Exception as e:
         logger.error(f"Error getting advanced prediction for {ticker}: {e}")
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
+@app.get("/extended-prediction/{ticker}")
+def get_extended_prediction(ticker: str):
+    """
+    Compatibility endpoint for frontend expecting /extended-prediction/{ticker}.
+    Returns the 30-day multi-scenario output similar to prediction-30day.
+    """
+    try:
+        future_predictions = predictor.predict_future_prices(ticker, days=30)
+        current_price = future_predictions.get("current_price", 0)
+        scenarios = future_predictions.get("prediction_scenarios", {})
+        base = scenarios.get("base", {})
+        predictions = base.get("predictions", [])
+        final_price = predictions[-1]["predicted_price"] if predictions else current_price
+        summary = {
+            "prediction_horizon": 30,
+            "average_confidence": future_predictions.get("average_confidence", 0.0),
+            "volatility_estimate": future_predictions.get("volatility_estimate", 0.0),
+            "trend_direction": "Bullish" if final_price > current_price else "Bearish",
+            "risk_level": future_predictions.get("risk_level", "Medium"),
+        }
+        return {
+            "ticker": ticker.upper(),
+            "current_price": round(current_price, 2),
+            "extended_predictions": {
+                "base_scenario": predictions,
+                "optimistic_scenario": scenarios.get("optimistic", {}).get("predictions", []),
+                "pessimistic_scenario": scenarios.get("pessimistic", {}).get("predictions", []),
+            },
+            "summary": summary,
+        }
+    except Exception as e:
+        logger.error(f"Error in extended prediction for {ticker}: {e}")
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
 @app.get("/prediction-scenarios/{ticker}")
