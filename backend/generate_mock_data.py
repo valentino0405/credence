@@ -16,7 +16,7 @@ def generate_mock_indian_news():
         "NIFTY {direction} {percent}% as {company} leads {trend}",  
         "Indian rupee {rupee_action} against dollar amid {reason}",
         "Foreign investors {fii_action} Indian markets, {impact} on indices",
-        "{company} announces major acquisition worth ₹{amount} crores",
+    "{company} announces major acquisition worth INR {amount} crores",
         "Monsoon impact: {sector} sector sees {impact} in rural demand",
         "Budget 2025: Government announces {policy} for {sector} sector"
     ]

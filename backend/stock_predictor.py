@@ -437,7 +437,7 @@ class StockPredictor:
                 daily_change = trend_impact + random_factor
                 predicted_price = base_price * (1 + daily_change)
                 
-                # Keep predictions within reasonable bounds (±5% daily max)
+                # Keep predictions within reasonable bounds (+/- 5% daily max)
                 max_daily_change = 0.05
                 min_price = base_price * (1 - max_daily_change)
                 max_price = base_price * (1 + max_daily_change)
@@ -505,14 +505,14 @@ class StockPredictor:
             # Mean Absolute Percentage Error
             mape = np.mean(np.abs((actual_prices - predicted_prices) / actual_prices)) * 100
             
-            # R² Score
+            # R2 Score
             ss_res = np.sum((actual_prices - predicted_prices) ** 2)
             ss_tot = np.sum((actual_prices - np.mean(actual_prices)) ** 2)
             r2 = 1 - (ss_res / ss_tot) if ss_tot != 0 else 0.0
             
             # Ensure realistic bounds for demo purposes
             mape = max(8.0, min(mape, 25.0))  # Keep MAPE between 8-25%
-            r2 = max(0.3, min(r2, 0.8))      # Keep R² between 0.3-0.8
+            r2 = max(0.3, min(r2, 0.8))      # Keep R2 between 0.3-0.8
             
             # Calculate median error (typically slightly lower than mean for normal distributions)
             median_error = round(mape * 0.85, 1)  # Median is typically ~85% of mean in financial data

@@ -54,11 +54,11 @@ async def handle_user_created(user_data):
             logger.error("Database not available")
             return
         
-        # Initialize user portfolio with ₹10,00,000 virtual money
+    # Initialize user portfolio with INR 10,00,000 virtual money
         portfolio_doc = {
             "user_id": user_id,
             "email": email,
-            "cash_balance": 1000000.0,  # ₹10 lakh starting money
+            "cash_balance": 1000000.0,  # INR 10 lakh starting money
             "total_value": 1000000.0,
             "holdings": [],
             "total_profit_loss": 0.0,

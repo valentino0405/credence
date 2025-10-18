@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 class TradingService:
     def __init__(self):
         self.trading_fee = 0.001  # 0.1% trading fee
-        self.min_order_value = 100  # Minimum ₹100 order
+        self.min_order_value = 100  # Minimum INR 100 order
 
     async def get_user_portfolio(self, user_id: str) -> Dict:
         """Get user's complete portfolio"""
@@ -95,7 +95,7 @@ class TradingService:
             total_cost = order_value + trading_fee
             
             if total_cost < self.min_order_value:
-                return {"success": False, "message": f"Minimum order value is ₹{self.min_order_value}"}
+                return {"success": False, "message": f"Minimum order value is INR {self.min_order_value}"}
             
             # Get user portfolio
             db = await get_database()
@@ -110,14 +110,14 @@ class TradingService:
             if portfolio["cash_balance"] < total_cost:
                 return {
                     "success": False, 
-                    "message": f"Insufficient funds. Need ₹{total_cost:.2f}, available ₹{portfolio['cash_balance']:.2f}"
+                    "message": f"Insufficient funds. Need INR {total_cost:.2f}, available INR {portfolio['cash_balance']:.2f}"
                 }
             
             # Execute buy order
             trade_result = await self._execute_buy_order(user_id, symbol, quantity, current_price, trading_fee)
             
             if trade_result["success"]:
-                logger.info(f"Buy order executed: {user_id} bought {quantity} shares of {symbol} at ₹{current_price}")
+                logger.info(f"Buy order executed: {user_id} bought {quantity} shares of {symbol} at INR {current_price}")
             
             return trade_result
             
@@ -167,7 +167,7 @@ class TradingService:
             trade_result = await self._execute_sell_order(user_id, symbol, quantity, current_price, trading_fee)
             
             if trade_result["success"]:
-                logger.info(f"Sell order executed: {user_id} sold {quantity} shares of {symbol} at ₹{current_price}")
+                logger.info(f"Sell order executed: {user_id} sold {quantity} shares of {symbol} at INR {current_price}")
             
             return trade_result
             
@@ -381,7 +381,7 @@ class TradingService:
             
             portfolio_doc = {
                 "user_id": user_id,
-                "cash_balance": 1000000.0,  # ₹10 lakh starting money
+                "cash_balance": 1000000.0,  # INR 10 lakh starting money
                 "holdings": [],
                 "total_trades": 0,
                 "created_at": datetime.utcnow(),
