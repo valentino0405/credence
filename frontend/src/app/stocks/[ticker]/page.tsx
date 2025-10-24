@@ -168,7 +168,18 @@ export default function StockPage(): React.ReactElement {
     chart: {
       type: 'candlestick' as const,
       height: 400,
-      toolbar: { show: true },
+      toolbar: { 
+        show: true,
+        tools: {
+          download: true,
+          selection: true,
+          zoom: true,
+          zoomin: true,
+          zoomout: true,
+          pan: true,
+          reset: true
+        }
+      },
       background: 'transparent',
       foreColor: '#d1d5db'
     },
@@ -176,8 +187,27 @@ export default function StockPage(): React.ReactElement {
     title: {
       text: `${stockData?.ticker} - 1 Day Chart`,
       align: 'left' as const,
-      style: { fontSize: '16px', fontWeight: '600', color: '#ffffff' }
+      style: { 
+        fontSize: typeof window !== 'undefined' && window.innerWidth < 640 ? '14px' : '16px', 
+        fontWeight: '600', 
+        color: '#ffffff' 
+      }
     },
+    responsive: [{
+      breakpoint: 640,
+      options: {
+        chart: {
+          toolbar: {
+            show: false
+          }
+        },
+        title: {
+          style: {
+            fontSize: '12px'
+          }
+        }
+      }
+    }],
     grid: {
       borderColor: 'rgba(255,255,255,0.08)',
       strokeDashArray: 3
@@ -228,7 +258,7 @@ export default function StockPage(): React.ReactElement {
   }
 
   return (
-    <div className='w-full min-h-screen relative bg-black flex justify-center items-start overflow-hidden'>
+    <div className='w-full min-h-screen relative bg-black flex justify-center items-start overflow-x-hidden'>
       <div style={{ width: "100%", height: "900px", position: "absolute", top: 0, left: 0 }}>
         <Aurora
           colorStops={["#7CFF67", "#B19EEF", "#5227FF"]}
@@ -238,27 +268,27 @@ export default function StockPage(): React.ReactElement {
         />
       </div>
 
-      <div className="flex w-full h-[calc(100vh-64px)] relative z-10">
-        {/* Left Panel - Stock Chart (75%) */}
-        <div className="flex-[3] p-4">
-          <div className="h-full rounded-2xl border border-white/10 bg-black/20 backdrop-blur-md p-4 shadow-lg shadow-black/30">
+      <div className="flex flex-col lg:flex-row w-full min-h-screen relative z-10 pt-16 sm:pt-20">
+        {/* Left Panel - Stock Chart */}
+        <div className="w-full lg:flex-[3] p-3 sm:p-4 lg:p-6">
+          <div className="rounded-xl sm:rounded-2xl border border-white/10 bg-black/30 backdrop-blur-md p-3 sm:p-4 shadow-lg shadow-black/30 h-[500px] sm:h-[600px] lg:h-[calc(100vh-140px)]">
             {/* Stock Header */}
-            <div className="mb-4">
-              <h1 className="text-3xl font-bold tracking-tight text-white m-0">{stockData?.ticker}</h1>
-              <div className="flex items-center gap-4 mt-2">
-                <span className="text-2xl font-semibold">${stockData?.current_price}</span>
-                <span className={(stockData?.change || 0) >= 0 ? 'text-emerald-400 font-semibold text-sm' : 'text-red-400 font-semibold text-sm'}>
+            <div className="mb-3 sm:mb-4">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-white m-0">{stockData?.ticker}</h1>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 lg:gap-4 mt-2">
+                <span className="text-lg sm:text-xl lg:text-2xl font-semibold">${stockData?.current_price}</span>
+                <span className={(stockData?.change || 0) >= 0 ? 'text-emerald-400 font-semibold text-xs sm:text-sm' : 'text-red-400 font-semibold text-xs sm:text-sm'}>
                   {(stockData?.change || 0) >= 0 ? '+' : ''}{stockData?.change}
                   ({(stockData?.change_percent || 0) >= 0 ? '+' : ''}{stockData?.change_percent}%)
                 </span>
-                <span className="text-xs text-white/70 font-medium">
+                <span className="text-xs sm:text-sm text-white/70 font-medium">
                   Volume: {stockData?.volume?.toLocaleString()}
                 </span>
               </div>
             </div>
 
             {/* Chart */}
-            <div className="h-[calc(100%-120px)]">
+            <div className="h-[400px] sm:h-[500px] lg:h-[calc(100%-100px)]">
               {stockData && (
                 <Chart
                   options={chartOptions}
@@ -274,10 +304,10 @@ export default function StockPage(): React.ReactElement {
           </div>
         </div>
 
-        {/* Right Panel - AI Predictions (25%) */}
-        <div className="flex-1 p-4 pr-4 border-l border-white/5 flex flex-col">
-          <div className="rounded-2xl border border-white/10 bg-black/20 backdrop-blur-md p-6 flex-1 shadow-lg shadow-black/30 overflow-y-auto">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-white">🤖 <span>AI Predictions</span></h2>
+        {/* Right Panel - AI Predictions */}
+        <div className="w-full lg:flex-1 p-3 sm:p-4 lg:p-6 lg:border-l border-white/5 flex flex-col">
+          <div className="rounded-xl sm:rounded-2xl border border-white/10 bg-black/30 backdrop-blur-md p-4 sm:p-5 lg:p-6 shadow-lg shadow-black/30 overflow-y-auto max-h-[600px] lg:max-h-[calc(100vh-140px)]">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 flex items-center gap-2 text-white">🤖 <span>AI Predictions</span></h2>
 
             {/* Loading State */}
             {aiLoading && (

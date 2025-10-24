@@ -129,7 +129,18 @@ const PredictionPage: React.FC = () => {
     chart: {
       type: 'line' as const,
       height: 400,
-      toolbar: { show: true },
+      toolbar: { 
+        show: true,
+        tools: {
+          download: true,
+          selection: true,
+          zoom: true,
+          zoomin: true,
+          zoomout: true,
+          pan: true,
+          reset: true
+        }
+      },
       background: 'transparent',
       foreColor: '#d1d5db'
     },
@@ -137,8 +148,31 @@ const PredictionPage: React.FC = () => {
     title: {
       text: `${ticker} - ${selectedDays} Day Price Prediction ${predictionType === 'extended' ? '(Multi-Scenario)' : ''}`,
       align: 'center' as const,
-      style: { fontSize: '18px', fontWeight: '600', color: '#ffffff' }
+      style: { 
+        fontSize: typeof window !== 'undefined' && window.innerWidth < 640 ? '12px' : window.innerWidth < 1024 ? '14px' : '18px', 
+        fontWeight: '600', 
+        color: '#ffffff' 
+      }
     },
+    responsive: [{
+      breakpoint: 640,
+      options: {
+        chart: {
+          toolbar: {
+            show: false
+          }
+        },
+        title: {
+          style: {
+            fontSize: '11px'
+          }
+        },
+        legend: {
+          position: 'bottom',
+          fontSize: '10px'
+        }
+      }
+    }],
     grid: {
       borderColor: 'rgba(255,255,255,0.08)',
       strokeDashArray: 3
@@ -250,16 +284,16 @@ const PredictionPage: React.FC = () => {
         />
       </div>
 
-      <div className="relative z-10 container mx-auto p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-300 to-blue-300 bg-clip-text text-transparent">
+      <div className="relative z-10 container mx-auto p-4 sm:p-6 lg:p-8">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-300 to-blue-300 bg-clip-text text-transparent">
             AI Stock Predictions
           </h1>
-          <p className="text-xl text-white/70">Advanced XGBoost machine learning predictions</p>
+          <p className="text-lg sm:text-xl text-white/70">Advanced XGBoost machine learning predictions</p>
         </div>
 
         {/* Controls */}
-        <div className="flex flex-col md:flex-row gap-6 mb-8 justify-center items-end">
+        <div className="flex flex-col md:flex-row gap-4 sm:gap-6 mb-6 sm:mb-8 justify-center items-end">
           <div className="flex flex-col gap-2 w-full md:w-auto">
             <label className="text-sm font-medium text-white/80">Stock Ticker</label>
             <input
@@ -267,7 +301,7 @@ const PredictionPage: React.FC = () => {
               value={ticker}
               onChange={(e) => setTicker(e.target.value.toUpperCase())}
               placeholder="Enter ticker (e.g., AAPL)"
-              className="px-4 py-2 rounded-lg bg-white/10 border border-white/20 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/40 focus:outline-none text-white placeholder-white/40"
+              className="px-4 py-2 rounded-lg bg-white/10 border border-white/20 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/40 focus:outline-none text-white placeholder-white/40 text-sm sm:text-base"
             />
           </div>
 
@@ -299,21 +333,21 @@ const PredictionPage: React.FC = () => {
           <button
             onClick={fetchPredictions}
             disabled={loading}
-            className="cursor-target px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-500 hover:to-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+            className="cursor-target px-4 sm:px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-500 hover:to-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap text-sm sm:text-base w-full md:w-auto"
           >
             {loading ? 'Loading...' : 'Get Predictions'}
           </button>
         </div>
 
         {/* Popular Stocks */}
-        <div className="mb-8 text-center">
-          <h3 className="text-lg font-semibold mb-4 text-white/90">Popular Stocks</h3>
+        <div className="mb-6 sm:mb-8 text-center">
+          <h3 className="text-base sm:text-lg font-semibold mb-4 text-white/90">Popular Stocks</h3>
           <div className="flex flex-wrap justify-center gap-2">
             {popularStocks.map((stock) => (
               <button
                 key={stock}
                 onClick={() => setTicker(stock)}
-                className={`cursor-target px-4 py-2 rounded-lg border transition-all ${
+                className={`cursor-target px-3 sm:px-4 py-2 rounded-lg border transition-all text-sm sm:text-base ${
                   ticker === stock 
                     ? 'bg-purple-600 border-purple-500 text-white' 
                     : 'bg-white/10 border-white/20 text-white/80 hover:bg-white/20'
@@ -377,20 +411,22 @@ const PredictionPage: React.FC = () => {
         )}
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* Chart Section */}
           <div className="lg:col-span-2">
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20">
               {(predictionData || extendedData) && !loading ? (
-                <Chart
-                  options={chartOptions}
-                  series={prepareChartData()}
-                  type="line"
-                  height={450}
-                />
+                <div className="w-full overflow-x-auto">
+                  <Chart
+                    options={chartOptions}
+                    series={prepareChartData()}
+                    type="line"
+                    height={window.innerWidth < 640 ? 300 : window.innerWidth < 1024 ? 350 : 450}
+                  />
+                </div>
               ) : loading ? (
-                <div className="flex items-center justify-center h-96">
-                  <div className="text-xl text-white/70">Loading predictions...</div>
+                <div className="flex items-center justify-center h-64 sm:h-96">
+                  <div className="text-base sm:text-xl text-white/70">Loading predictions...</div>
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-96">

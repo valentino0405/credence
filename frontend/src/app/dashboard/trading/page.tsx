@@ -176,34 +176,34 @@ export default function TradingDashboard(): React.ReactElement | null {
       
       {/* Header */}
       <div className="border-b border-gray-800 bg-black/50 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-                <ChartBarIcon className="h-8 w-8 text-purple-500" />
+              <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                <ChartBarIcon className="h-6 w-6 sm:h-8 sm:w-8 text-purple-500" />
                 Trading Dashboard
               </h1>
-              <p className="text-gray-400 mt-1">Mock trading with real market data</p>
+              <p className="text-gray-400 mt-1 text-sm sm:text-base">Mock trading with real market data</p>
             </div>
             
             {/* Portfolio Summary */}
             {portfolio && (
-              <div className="flex gap-6 text-sm">
-                <div className="text-center">
+              <div className="flex gap-4 sm:gap-6 text-xs sm:text-sm w-full sm:w-auto">
+                <div className="text-center flex-1 sm:flex-none">
                   <p className="text-gray-400">Portfolio Value</p>
-                  <p className="text-white font-bold text-lg">
+                  <p className="text-white font-bold text-base sm:text-lg">
                     ₹{portfolio.total_portfolio_value.toLocaleString('en-IN')}
                   </p>
                 </div>
-                <div className="text-center">
+                <div className="text-center flex-1 sm:flex-none">
                   <p className="text-gray-400">P&L</p>
-                  <p className={`font-bold text-lg ${portfolio.total_pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  <p className={`font-bold text-base sm:text-lg ${portfolio.total_pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                     {portfolio.total_pnl >= 0 ? '+' : ''}₹{portfolio.total_pnl.toLocaleString('en-IN')}
                   </p>
                 </div>
-                <div className="text-center">
+                <div className="text-center flex-1 sm:flex-none">
                   <p className="text-gray-400">Cash</p>
-                  <p className="text-white font-bold text-lg">
+                  <p className="text-white font-bold text-base sm:text-lg">
                     ₹{portfolio.cash_balance.toLocaleString('en-IN')}
                   </p>
                 </div>
@@ -214,11 +214,11 @@ export default function TradingDashboard(): React.ReactElement | null {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-12 gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
           
           {/* Left Sidebar - Watchlist */}
-          <div className="col-span-3">
+          <div className="lg:col-span-3 order-2 lg:order-1">
             <Watchlist 
               watchlist={watchlist}
               selectedStock={selectedStock}
@@ -227,40 +227,40 @@ export default function TradingDashboard(): React.ReactElement | null {
           </div>
           
           {/* Main Content Area */}
-          <div className="col-span-6">
+          <div className="lg:col-span-6 order-1 lg:order-2">
             {/* Tab Navigation */}
-            <div className="flex bg-gray-800/50 rounded-lg p-1 mb-6">
+            <div className="flex bg-gray-800/50 rounded-lg p-1 mb-4 sm:mb-6 overflow-x-auto">
               <button
                 onClick={() => setActiveTab('chart')}
-                className={`flex-1 py-2 px-4 rounded-md transition-colors ${
+                className={`flex-1 py-2 px-2 sm:px-4 rounded-md transition-colors whitespace-nowrap text-sm sm:text-base ${
                   activeTab === 'chart' 
                     ? 'bg-purple-600 text-white' 
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
-                <ChartBarIcon className="h-5 w-5 inline mr-2" />
+                <ChartBarIcon className="h-4 w-4 sm:h-5 sm:w-5 inline mr-1 sm:mr-2" />
                 Chart
               </button>
               <button
                 onClick={() => setActiveTab('portfolio')}
-                className={`flex-1 py-2 px-4 rounded-md transition-colors ${
+                className={`flex-1 py-2 px-2 sm:px-4 rounded-md transition-colors whitespace-nowrap text-sm sm:text-base ${
                   activeTab === 'portfolio' 
                     ? 'bg-purple-600 text-white' 
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
-                <EyeIcon className="h-5 w-5 inline mr-2" />
+                <EyeIcon className="h-4 w-4 sm:h-5 sm:w-5 inline mr-1 sm:mr-2" />
                 Portfolio
               </button>
               <button
                 onClick={() => setActiveTab('orders')}
-                className={`flex-1 py-2 px-4 rounded-md transition-colors ${
+                className={`flex-1 py-2 px-2 sm:px-4 rounded-md transition-colors whitespace-nowrap text-sm sm:text-base ${
                   activeTab === 'orders' 
                     ? 'bg-purple-600 text-white' 
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
-                <ClockIcon className="h-5 w-5 inline mr-2" />
+                <ClockIcon className="h-4 w-4 sm:h-5 sm:w-5 inline mr-1 sm:mr-2" />
                 Orders
               </button>
             </div>
@@ -273,16 +273,16 @@ export default function TradingDashboard(): React.ReactElement | null {
               transition={{ duration: 0.3 }}
             >
               {activeTab === 'chart' && selectedStock && (
-                <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl border border-gray-700 p-6">
-                  <div className="mb-6">
-                    <div className="flex justify-between items-start">
+                <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl border border-gray-700 p-4 sm:p-6">
+                  <div className="mb-4 sm:mb-6">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                       <div>
-                        <h2 className="text-2xl font-bold text-white">{selectedStock.name}</h2>
-                        <p className="text-gray-400">{selectedStock.symbol}</p>
+                        <h2 className="text-xl sm:text-2xl font-bold text-white">{selectedStock.name}</h2>
+                        <p className="text-gray-400 text-sm sm:text-base">{selectedStock.symbol}</p>
                       </div>
-                      <div className="text-right">
-                        <p className="text-3xl font-bold text-white">₹{selectedStock.price.toFixed(2)}</p>
-                        <p className={`flex items-center ${selectedStock.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      <div className="text-left sm:text-right w-full sm:w-auto">
+                        <p className="text-2xl sm:text-3xl font-bold text-white">₹{selectedStock.price.toFixed(2)}</p>
+                        <p className={`flex items-center text-sm sm:text-base ${selectedStock.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                           {selectedStock.change >= 0 ? (
                             <ArrowTrendingUpIcon className="h-4 w-4 mr-1" />
                           ) : (
@@ -305,17 +305,17 @@ export default function TradingDashboard(): React.ReactElement | null {
               )}
 
               {activeTab === 'orders' && (
-                <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl border border-gray-700 p-6">
-                  <h3 className="text-xl font-bold text-white mb-4">Order History</h3>
-                  <p className="text-gray-400">Order history will be displayed here...</p>
+                <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl border border-gray-700 p-4 sm:p-6">
+                  <h3 className="text-lg sm:text-xl font-bold text-white mb-4">Order History</h3>
+                  <p className="text-gray-400 text-sm sm:text-base">Order history will be displayed here...</p>
                 </div>
               )}
             </motion.div>
           </div>
           
           {/* Right Sidebar - Order Panel */}
-          <div className="col-span-3">
-            <div className="space-y-6">
+          <div className="lg:col-span-3 order-3">
+            <div className="space-y-4 sm:space-y-6">
               {selectedStock && (
                 <OrderPanel 
                   stock={selectedStock}

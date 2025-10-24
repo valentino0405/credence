@@ -128,53 +128,53 @@ export default function NewsAndSentimentPage(): React.ReactElement {
 
       {/* Content */}
       <div className="relative z-10 min-h-screen">
-        <div className="container mx-auto px-6 py-8">
+        <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-8">
           {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30">
-                <NewspaperIcon className="w-8 h-8 text-blue-400" />
+          <div className="mb-6 sm:mb-8">
+            <div className="flex items-center gap-3 sm:gap-4 mb-4">
+              <div className="p-2 sm:p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30">
+                <NewspaperIcon className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                   News & Sentiment Analysis
                 </h1>
-                <p className="text-white/60 text-lg">
+                <p className="text-white/60 text-sm sm:text-base lg:text-lg">
                   AI-powered Indian market sentiment from news and social media
                 </p>
               </div>
             </div>
 
             {/* Action Bar */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
                 {lastUpdated && (
-                  <div className="text-sm text-white/60">
+                  <div className="text-xs sm:text-sm text-white/60">
                     Last updated: {new Date(lastUpdated).toLocaleString()}
                   </div>
                 )}
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                  <span className="text-sm text-green-400">Live Data</span>
+                  <span className="text-xs sm:text-sm text-green-400">Live Data</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
                 <button
                   onClick={handleRefreshAll}
                   disabled={isLoading}
-                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-400 rounded-lg hover:from-blue-500/30 hover:to-purple-500/30 transition-all duration-200 disabled:opacity-50"
+                  className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-400 rounded-lg hover:from-blue-500/30 hover:to-purple-500/30 transition-all duration-200 disabled:opacity-50 text-xs sm:text-sm flex-1 sm:flex-none justify-center"
                 >
                   <ArrowPathIcon className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-                  <span className="text-sm font-medium">Refresh All</span>
+                  <span className="font-medium">Refresh All</span>
                 </button>
               </div>
             </div>
           </div>
 
           {/* Navigation Tabs */}
-          <div className="mb-8">
-            <div className="flex items-center gap-1 p-1 bg-white/5 rounded-xl border border-white/10 w-fit">
+          <div className="mb-6 sm:mb-8 overflow-x-auto">
+            <div className="flex items-center gap-1 p-1 bg-white/5 rounded-xl border border-white/10 w-fit min-w-full sm:min-w-0">
               {[
                 { key: 'overview', label: 'Overview', icon: ChartBarIcon },
                 { key: 'news', label: 'Latest News', icon: NewspaperIcon },
@@ -183,14 +183,15 @@ export default function NewsAndSentimentPage(): React.ReactElement {
                 <button
                   key={key}
                   onClick={() => setActiveTab(key as any)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                     activeTab === key
                       ? 'bg-white/20 text-white border border-white/20'
                       : 'text-white/60 hover:text-white/80 hover:bg-white/10'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
-                  {label}
+                  <span className="hidden sm:inline">{label}</span>
+                  <span className="sm:hidden">{label.split(' ')[0]}</span>
                 </button>
               ))}
             </div>

@@ -222,31 +222,31 @@ export default function ChatbotPage() {
     <div className="min-h-screen bg-gray-50 relative overflow-hidden">
       <Aurora />
       
-      <div className="relative z-10 container mx-auto px-4 py-8 max-w-4xl">
-        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 flex flex-col h-[calc(100vh-8rem)]">
+      <div className="relative z-10 container mx-auto px-4 py-4 sm:py-8 max-w-4xl">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 flex flex-col h-[calc(100vh-4rem)] sm:h-[calc(100vh-8rem)]">
           
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-2xl">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 sm:p-6 rounded-t-2xl">
             <div className="flex items-center space-x-3">
               <div className="bg-white/20 p-2 rounded-full">
-                <Bot className="h-6 w-6" />
+                <Bot className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold">Credence AI Assistant</h1>
-                <p className="text-blue-100">Your intelligent trading companion</p>
+                <h1 className="text-xl sm:text-2xl font-bold">Credence AI Assistant</h1>
+                <p className="text-blue-100 text-sm sm:text-base">Your intelligent trading companion</p>
               </div>
             </div>
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 p-6 overflow-y-auto space-y-4">
+          <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4">
             {messages.map((message) => (
               <div
                 key={message.id}
                 className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                  className={`max-w-[85%] sm:max-w-[80%] rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base ${
                     message.isUser
                       ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'
                       : 'bg-gray-100 text-gray-800 border'
@@ -316,28 +316,28 @@ export default function ChatbotPage() {
           )}
 
           {/* Input Area */}
-          <div className="p-6 border-t bg-gray-50/50">
-            <div className="flex space-x-4">
+          <div className="p-4 sm:p-6 border-t bg-gray-50/50">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
               <div className="flex-1">
                 <input
                   type="text"
-                  placeholder="Ask me about trading, stocks, or market analysis..."
+                  placeholder="Ask me about trading, stocks..."
                   value={inputMessage}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
                   disabled={isLoading}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 outline-none text-gray-900 placeholder-gray-500"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 outline-none text-gray-900 placeholder-gray-500 text-sm sm:text-base"
                 />
               </div>
               <button
                 onClick={() => sendMessage()}
                 disabled={isLoading || !inputMessage.trim()}
-                className="cursor-target bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-6 py-3 rounded-xl transition-all transform hover:scale-105 disabled:hover:scale-100 disabled:opacity-50"
+                className="cursor-target bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl transition-all transform hover:scale-105 disabled:hover:scale-100 disabled:opacity-50 w-full sm:w-auto"
               >
                 {isLoading ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <Loader2 className="h-5 w-5 animate-spin mx-auto" />
                 ) : (
-                  <Send className="h-5 w-5" />
+                  <Send className="h-5 w-5 mx-auto sm:mx-0" />
                 )}
               </button>
             </div>

@@ -121,13 +121,13 @@ export default function Dashboard(): React.ReactElement {
         />
       </div>
 
-      <div className="relative z-10 container mx-auto p-8">
+      <div className="relative z-10 container mx-auto p-4 sm:p-6 lg:p-8">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-300 to-blue-300 bg-clip-text text-transparent">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-300 to-blue-300 bg-clip-text text-transparent">
             AI Trading Dashboard
           </h1>
-          <p className="text-xl text-white/70">Welcome back, {user?.firstName || 'Trader'}!</p>
+          <p className="text-lg sm:text-xl text-white/70">Welcome back, {user?.firstName || 'Trader'}!</p>
         </div>
 
         {loading ? (
@@ -171,21 +171,21 @@ export default function Dashboard(): React.ReactElement {
             )}
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
               {/* Stock Analysis */}
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 flex flex-col">
-                <h3 className="text-xl font-semibold text-white mb-4">Stock Analysis</h3>
+              <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20 flex flex-col">
+                <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">Stock Analysis</h3>
                 <form onSubmit={handleSubmit} className="flex-1 flex flex-col justify-between">
                   <input
                     type="text"
                     value={ticker}
                     onChange={(e) => setTicker(e.target.value)}
                     placeholder="Enter ticker (e.g., AAPL)"
-                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/40 focus:outline-none text-white placeholder-white/40 mb-4"
+                    className="w-full px-4 py-2 sm:py-3 rounded-lg bg-white/10 border border-white/20 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/40 focus:outline-none text-white placeholder-white/40 mb-4 text-sm sm:text-base"
                   />
                   <button
                     type="submit"
-                    className="cursor-target w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-500 hover:to-blue-500 transition-colors"
+                    className="cursor-target w-full px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-500 hover:to-blue-500 transition-colors text-sm sm:text-base"
                   >
                     Analyze Stock
                   </button>
@@ -193,36 +193,36 @@ export default function Dashboard(): React.ReactElement {
               </div>
 
             {/* Trading Platform */}
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 flex flex-col">
-              <h3 className="text-xl font-semibold text-white mb-4">Mock Trading</h3>
-              <p className="text-white/70 mb-4 flex-1">Practice trading with real market data and AI insights</p>
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20 flex flex-col">
+              <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">Mock Trading</h3>
+              <p className="text-white/70 mb-4 flex-1 text-sm sm:text-base">Practice trading with real market data and AI insights</p>
               <button
                 onClick={() => router.push('/dashboard/trading')}
-                className="cursor-target w-full px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-500 hover:to-emerald-500 transition-colors"
+                className="cursor-target w-full px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-500 hover:to-emerald-500 transition-colors text-sm sm:text-base"
               >
                 Start Trading
               </button>
             </div>
 
             {/* AI Chat */}
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 flex flex-col">
-              <h3 className="text-xl font-semibold text-white mb-4">🤖 AI Assistant</h3>
-              <p className="text-white/70 mb-4 flex-1">Get AI-powered market insights and trading advice</p>
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20 flex flex-col">
+              <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">🤖 AI Assistant</h3>
+              <p className="text-white/70 mb-4 flex-1 text-sm sm:text-base">Get AI-powered market insights and trading advice</p>
               <button
                 onClick={() => router.push('/chatbot')}
-                className="cursor-target w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-500 hover:to-purple-500 transition-colors"
+                className="cursor-target w-full px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-500 hover:to-purple-500 transition-colors text-sm sm:text-base"
               >
                 Start AI Chat
               </button>
             </div>
 
               {/* Predictions */}
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 flex flex-col">
-                <h3 className="text-xl font-semibold text-white mb-4">Predictions</h3>
-                <p className="text-white/70 mb-4 flex-1">Advanced ML predictions up to 30 days</p>
+              <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20 flex flex-col">
+                <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">Predictions</h3>
+                <p className="text-white/70 mb-4 flex-1 text-sm sm:text-base">Advanced ML predictions up to 30 days</p>
                 <button
                   onClick={() => router.push('/prediction')}
-                  className="cursor-target w-full px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-600 text-white font-semibold rounded-lg hover:from-orange-500 hover:to-amber-500 transition-colors"
+                  className="cursor-target w-full px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-orange-600 to-amber-600 text-white font-semibold rounded-lg hover:from-orange-500 hover:to-amber-500 transition-colors text-sm sm:text-base"
                 >
                   View Predictions
                 </button>

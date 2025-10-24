@@ -130,24 +130,24 @@ const MarketPage: React.FC = () => {
         />
       </div>
 
-      <div className="relative z-10 container mx-auto p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-300 to-blue-300 bg-clip-text text-transparent">
+      <div className="relative z-10 container mx-auto p-4 sm:p-6 lg:p-8">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-300 to-blue-300 bg-clip-text text-transparent">
             Market Overview
           </h1>
-          <p className="text-xl text-white/70">Real-time market data with AI-powered insights</p>
+          <p className="text-lg sm:text-xl text-white/70">Real-time market data with AI-powered insights</p>
         </div>
 
         {/* Market Sentiment Card */}
-        <div className="mb-8">
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 text-center">
-            <h2 className="text-2xl font-semibold mb-4 text-white">Overall Market Sentiment</h2>
+        <div className="mb-6 sm:mb-8">
+          <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20 text-center">
+            <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-white">Overall Market Sentiment</h2>
             <div className="flex items-center justify-center gap-4 mb-4">
               <div>
-                <div className={`text-3xl font-bold ${getSentimentColor(marketSentiment.sentiment)}`}>
+                <div className={`text-2xl sm:text-3xl font-bold ${getSentimentColor(marketSentiment.sentiment)}`}>
                   {getSentimentEmoji(marketSentiment.sentiment)}
                 </div>
-                <div className="text-white/70">
+                <div className="text-white/70 text-sm sm:text-base">
                   {marketSentiment.percentage.toFixed(1)}% Bullish Stocks
                 </div>
               </div>
@@ -162,11 +162,11 @@ const MarketPage: React.FC = () => {
         </div>
 
         {/* Controls */}
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-6 sm:mb-8">
           <button
             onClick={fetchMarketData}
             disabled={loading}
-            className="cursor-target px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-500 hover:to-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="cursor-target px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-500 hover:to-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
           >
             {loading ? 'Refreshing...' : 'Refresh Market Data'}
           </button>
@@ -174,9 +174,9 @@ const MarketPage: React.FC = () => {
 
         {/* Market Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {popularStocks.map((ticker) => (
-              <div key={ticker} className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 animate-pulse">
+              <div key={ticker} className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20 animate-pulse">
                 <div className="h-6 bg-white/20 rounded mb-4"></div>
                 <div className="h-8 bg-white/20 rounded mb-2"></div>
                 <div className="h-4 bg-white/20 rounded mb-4"></div>
@@ -185,23 +185,23 @@ const MarketPage: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {marketData.map((stock) => (
               <div 
                 key={stock.ticker} 
-                className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 hover:bg-white/15 transition-all cursor-pointer group"
+                className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20 hover:bg-white/15 transition-all cursor-pointer group"
                 onClick={() => window.open(`/stocks/${stock.ticker}`, '_blank')}
               >
                 {stock.error ? (
                   <div className="text-center text-red-400">
-                    <h3 className="text-xl font-bold mb-2">{stock.ticker}</h3>
+                    <h3 className="text-lg sm:text-xl font-bold mb-2">{stock.ticker}</h3>
                     <p className="text-sm">Failed to load</p>
                   </div>
                 ) : (
                   <>
                     {/* Header */}
                     <div className="flex justify-between items-start mb-4">
-                      <h3 className="text-xl font-bold text-white group-hover:text-purple-300 transition-colors">
+                      <h3 className="text-lg sm:text-xl font-bold text-white group-hover:text-purple-300 transition-colors">
                         {stock.ticker}
                       </h3>
                       <div className={`px-2 py-1 rounded text-xs font-semibold ${
@@ -215,7 +215,7 @@ const MarketPage: React.FC = () => {
 
                     {/* Current Price */}
                     <div className="mb-4">
-                      <div className="text-2xl font-bold text-white">
+                      <div className="text-xl sm:text-2xl font-bold text-white">
                         ${stock.current_price.toFixed(2)}
                       </div>
                       <div className={`text-sm font-medium ${
