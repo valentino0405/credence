@@ -1,15 +1,20 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useUser } from '@clerk/nextjs';
 
 export default function UserTracker() {
   const { user, isSignedIn, isLoaded } = useUser();
+  const hasAttemptedSave = useRef(false);
 
   useEffect(() => {
     const saveUserOnLogin = async () => {
       // Wait for Clerk to load and confirm user is signed in
       if (!isLoaded || !isSignedIn || !user) return;
+      
+      // Prevent multiple save attempts for the same user session
+      if (hasAttemptedSave.current) return;
+      hasAttemptedSave.current = true;
       
       try {
         const userEmail = user.primaryEmailAddress?.emailAddress;
@@ -32,6 +37,14 @@ export default function UserTracker() {
             })
           });
           
+          if (!response.ok) {
+            console.error('Failed to save user profile - HTTP Error:', response.status, response.statusText);
+            const errorText = await response.text();
+            console.error('Response body:', errorText);
+            hasAttemptedSave.current = false; // Allow retry on next login
+            return;
+          }
+          
           const result = await response.json();
           
           if (result.success) {
@@ -42,13 +55,19 @@ export default function UserTracker() {
               isNewUser: result.upserted > 0 ? 'YES' : 'NO'
             });
           } else {
-            console.error('Failed to save login user profile:', result);
+            console.error('Failed to save login user profile:', {
+              error: result.error || 'Unknown error',
+              details: result,
+              hint: result.hint || 'Check database connection'
+            });
+            hasAttemptedSave.current = false; // Allow retry on next login
           }
         } else {
           console.warn('User logged in but no email found:', user);
         }
       } catch (error) {
         console.error('Error saving user profile on login:', error);
+        hasAttemptedSave.current = false; // Allow retry on next login
       }
     };
     

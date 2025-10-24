@@ -259,8 +259,8 @@ const PredictionPage: React.FC = () => {
         </div>
 
         {/* Controls */}
-        <div className="flex flex-col md:flex-row gap-6 mb-8 justify-center items-center">
-          <div className="flex flex-col gap-2">
+        <div className="flex flex-col md:flex-row gap-6 mb-8 justify-center items-end">
+          <div className="flex flex-col gap-2 w-full md:w-auto">
             <label className="text-sm font-medium text-white/80">Stock Ticker</label>
             <input
               type="text"
@@ -271,25 +271,35 @@ const PredictionPage: React.FC = () => {
             />
           </div>
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 w-full md:w-auto">
             <label className="text-sm font-medium text-white/80">Prediction Days</label>
             <select
               value={selectedDays}
               onChange={(e) => setSelectedDays(Number(e.target.value))}
-              className="px-4 py-2 rounded-lg bg-white/10 border border-white/20 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/40 focus:outline-none text-white"
+              className="px-4 py-2 rounded-lg bg-white/10 border border-white/20 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/40 focus:outline-none text-white cursor-pointer"
+              style={{ 
+                backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3E%3Cpath stroke=\'%239CA3AF\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M6 8l4 4 4-4\'/%3E%3C/svg%3E")',
+                backgroundPosition: 'right 0.5rem center',
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: '1.5em 1.5em',
+                paddingRight: '2.5rem',
+                appearance: 'none',
+                WebkitAppearance: 'none',
+                MozAppearance: 'none'
+              }}
             >
-              <option value={3}>3 Days</option>
-              <option value={5}>5 Days</option>
-              <option value={7}>1 Week</option>
-              <option value={14}>2 Weeks</option>
-              <option value={30}>30 Days (Multi-Scenario)</option>
+              <option value={3} className="bg-gray-900 text-white">3 Days</option>
+              <option value={5} className="bg-gray-900 text-white">5 Days</option>
+              <option value={7} className="bg-gray-900 text-white">1 Week</option>
+              <option value={14} className="bg-gray-900 text-white">2 Weeks</option>
+              <option value={30} className="bg-gray-900 text-white">30 Days (Multi-Scenario)</option>
             </select>
           </div>
 
           <button
             onClick={fetchPredictions}
             disabled={loading}
-            className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-500 hover:to-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-500 hover:to-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
           >
             {loading ? 'Loading...' : 'Get Predictions'}
           </button>

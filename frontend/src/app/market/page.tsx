@@ -143,10 +143,9 @@ const MarketPage: React.FC = () => {
           <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 text-center">
             <h2 className="text-2xl font-semibold mb-4 text-white">Overall Market Sentiment</h2>
             <div className="flex items-center justify-center gap-4 mb-4">
-              <span className="text-4xl">{getSentimentEmoji(marketSentiment.sentiment)}</span>
               <div>
                 <div className={`text-3xl font-bold ${getSentimentColor(marketSentiment.sentiment)}`}>
-                  {marketSentiment.sentiment.replace('_', ' ')}
+                  {getSentimentEmoji(marketSentiment.sentiment)}
                 </div>
                 <div className="text-white/70">
                   {marketSentiment.percentage.toFixed(1)}% Bullish Stocks

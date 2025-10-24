@@ -6,17 +6,25 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { userId, email, name } = body;
 
-    console.log('USER SAVE REQUEST:', { userId, email });
+    console.log('USER SAVE REQUEST:', { userId, email, name });
 
     if (!userId || !email) {
-            console.log('Missing userId or email');
-      return NextResponse.json({ success: false, error: 'userId and email required' }, { status: 400 });
+      console.log('Missing userId or email');
+      return NextResponse.json({ 
+        success: false, 
+        error: 'userId and email required',
+        details: { userId: !!userId, email: !!email }
+      }, { status: 400 });
     }
 
     const dbCtx = await getDb();
     if (!dbCtx) {
-            console.log('Database connection failed');
-      return NextResponse.json({ success: false, error: 'Database connection failed' }, { status: 500 });
+      console.log('Database connection failed - MONGODB_URI may not be set');
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Database connection failed',
+        hint: 'Check if MONGODB_URI is set in environment variables'
+      }, { status: 500 });
     }
 
       console.log('Database connected, saving user...');    // Upsert user profile
