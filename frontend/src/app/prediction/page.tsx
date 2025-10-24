@@ -499,44 +499,55 @@ const PredictionPage: React.FC = () => {
             )}
 
             {/* Scenario Predictions for Extended Mode */}
-            {extendedData && (
+            {extendedData && extendedData.extended_predictions && (
               <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
                 <h3 className="text-xl font-semibold mb-4 text-white">Scenario Outcomes (30 days)</h3>
                 <div className="space-y-4">
-                  <div className="p-3 bg-green-500/20 rounded-lg">
-                    <div className="flex justify-between items-center">
-                      <span className="text-green-300 font-medium">Optimistic</span>
-                      <span className="text-green-300 font-bold">
-                        ${extendedData.extended_predictions.optimistic_scenario[29].predicted_price.toFixed(2)}
-                      </span>
+                  {extendedData.extended_predictions.optimistic_scenario && extendedData.extended_predictions.optimistic_scenario.length > 0 && (
+                    <div className="p-3 bg-green-500/20 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <span className="text-green-300 font-medium">Optimistic</span>
+                        <span className="text-green-300 font-bold">
+                          ${extendedData.extended_predictions.optimistic_scenario[extendedData.extended_predictions.optimistic_scenario.length - 1]?.predicted_price?.toFixed(2) || 'N/A'}
+                        </span>
+                      </div>
+                      <div className="text-green-300/70 text-sm">
+                        {extendedData.extended_predictions.optimistic_scenario[extendedData.extended_predictions.optimistic_scenario.length - 1]?.predicted_price 
+                          ? `+${((extendedData.extended_predictions.optimistic_scenario[extendedData.extended_predictions.optimistic_scenario.length - 1].predicted_price - extendedData.current_price) / extendedData.current_price * 100).toFixed(1)}%`
+                          : 'N/A'}
+                      </div>
                     </div>
-                    <div className="text-green-300/70 text-sm">
-                      +{((extendedData.extended_predictions.optimistic_scenario[29].predicted_price - extendedData.current_price) / extendedData.current_price * 100).toFixed(1)}%
+                  )}
+                  {extendedData.extended_predictions.base_scenario && extendedData.extended_predictions.base_scenario.length > 0 && (
+                    <div className="p-3 bg-blue-500/20 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <span className="text-blue-300 font-medium">Base Case</span>
+                        <span className="text-blue-300 font-bold">
+                          ${extendedData.extended_predictions.base_scenario[extendedData.extended_predictions.base_scenario.length - 1]?.predicted_price?.toFixed(2) || 'N/A'}
+                        </span>
+                      </div>
+                      <div className="text-blue-300/70 text-sm">
+                        {extendedData.extended_predictions.base_scenario[extendedData.extended_predictions.base_scenario.length - 1]?.predicted_price 
+                          ? `${((extendedData.extended_predictions.base_scenario[extendedData.extended_predictions.base_scenario.length - 1].predicted_price - extendedData.current_price) / extendedData.current_price * 100) >= 0 ? '+' : ''}${((extendedData.extended_predictions.base_scenario[extendedData.extended_predictions.base_scenario.length - 1].predicted_price - extendedData.current_price) / extendedData.current_price * 100).toFixed(1)}%`
+                          : 'N/A'}
+                      </div>
                     </div>
-                  </div>
-                  <div className="p-3 bg-blue-500/20 rounded-lg">
-                    <div className="flex justify-between items-center">
-                      <span className="text-blue-300 font-medium">Base Case</span>
-                      <span className="text-blue-300 font-bold">
-                        ${extendedData.extended_predictions.base_scenario[29].predicted_price.toFixed(2)}
-                      </span>
+                  )}
+                  {extendedData.extended_predictions.pessimistic_scenario && extendedData.extended_predictions.pessimistic_scenario.length > 0 && (
+                    <div className="p-3 bg-red-500/20 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <span className="text-red-300 font-medium">Pessimistic</span>
+                        <span className="text-red-300 font-bold">
+                          ${extendedData.extended_predictions.pessimistic_scenario[extendedData.extended_predictions.pessimistic_scenario.length - 1]?.predicted_price?.toFixed(2) || 'N/A'}
+                        </span>
+                      </div>
+                      <div className="text-red-300/70 text-sm">
+                        {extendedData.extended_predictions.pessimistic_scenario[extendedData.extended_predictions.pessimistic_scenario.length - 1]?.predicted_price 
+                          ? `${((extendedData.extended_predictions.pessimistic_scenario[extendedData.extended_predictions.pessimistic_scenario.length - 1].predicted_price - extendedData.current_price) / extendedData.current_price * 100).toFixed(1)}%`
+                          : 'N/A'}
+                      </div>
                     </div>
-                    <div className="text-blue-300/70 text-sm">
-                      {((extendedData.extended_predictions.base_scenario[29].predicted_price - extendedData.current_price) / extendedData.current_price * 100) >= 0 ? '+' : ''}
-                      {((extendedData.extended_predictions.base_scenario[29].predicted_price - extendedData.current_price) / extendedData.current_price * 100).toFixed(1)}%
-                    </div>
-                  </div>
-                  <div className="p-3 bg-red-500/20 rounded-lg">
-                    <div className="flex justify-between items-center">
-                      <span className="text-red-300 font-medium">Pessimistic</span>
-                      <span className="text-red-300 font-bold">
-                        ${extendedData.extended_predictions.pessimistic_scenario[29].predicted_price.toFixed(2)}
-                      </span>
-                    </div>
-                    <div className="text-red-300/70 text-sm">
-                      {((extendedData.extended_predictions.pessimistic_scenario[29].predicted_price - extendedData.current_price) / extendedData.current_price * 100).toFixed(1)}%
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
             )}
