@@ -166,7 +166,7 @@ const MarketPage: React.FC = () => {
           <button
             onClick={fetchMarketData}
             disabled={loading}
-            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-500 hover:to-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="cursor-target px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-500 hover:to-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Refreshing...' : 'Refresh Market Data'}
           </button>

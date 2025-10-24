@@ -332,7 +332,7 @@ export default function ChatbotPage() {
               <button
                 onClick={() => sendMessage()}
                 disabled={isLoading || !inputMessage.trim()}
-                className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-6 py-3 rounded-xl transition-all transform hover:scale-105 disabled:hover:scale-100 disabled:opacity-50"
+                className="cursor-target bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-6 py-3 rounded-xl transition-all transform hover:scale-105 disabled:hover:scale-100 disabled:opacity-50"
               >
                 {isLoading ? (
                   <Loader2 className="h-5 w-5 animate-spin" />

@@ -299,7 +299,7 @@ const PredictionPage: React.FC = () => {
           <button
             onClick={fetchPredictions}
             disabled={loading}
-            className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-500 hover:to-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+            className="cursor-target px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-500 hover:to-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
           >
             {loading ? 'Loading...' : 'Get Predictions'}
           </button>
@@ -313,7 +313,7 @@ const PredictionPage: React.FC = () => {
               <button
                 key={stock}
                 onClick={() => setTicker(stock)}
-                className={`px-4 py-2 rounded-lg border transition-all ${
+                className={`cursor-target px-4 py-2 rounded-lg border transition-all ${
                   ticker === stock 
                     ? 'bg-purple-600 border-purple-500 text-white' 
                     : 'bg-white/10 border-white/20 text-white/80 hover:bg-white/20'

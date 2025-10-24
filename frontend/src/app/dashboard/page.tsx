@@ -173,19 +173,19 @@ export default function Dashboard(): React.ReactElement {
             {/* Quick Actions */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
               {/* Stock Analysis */}
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 flex flex-col">
                 <h3 className="text-xl font-semibold text-white mb-4">Stock Analysis</h3>
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="flex-1 flex flex-col justify-between">
                   <input
                     type="text"
                     value={ticker}
                     onChange={(e) => setTicker(e.target.value)}
                     placeholder="Enter ticker (e.g., AAPL)"
-                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/40 focus:outline-none text-white placeholder-white/40"
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/40 focus:outline-none text-white placeholder-white/40 mb-4"
                   />
                   <button
                     type="submit"
-                    className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-500 hover:to-blue-500 transition-colors"
+                    className="cursor-target w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-500 hover:to-blue-500 transition-colors"
                   >
                     Analyze Stock
                   </button>
@@ -193,34 +193,36 @@ export default function Dashboard(): React.ReactElement {
               </div>
 
             {/* Trading Platform */}
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 flex flex-col">
               <h3 className="text-xl font-semibold text-white mb-4">Mock Trading</h3>
-              <p className="text-white/70 mb-4">Practice trading with real market data and AI insights</p>
+              <p className="text-white/70 mb-4 flex-1">Practice trading with real market data and AI insights</p>
               <button
                 onClick={() => router.push('/dashboard/trading')}
-                className="w-full px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-500 hover:to-emerald-500 transition-colors"
+                className="cursor-target w-full px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-500 hover:to-emerald-500 transition-colors"
               >
                 Start Trading
               </button>
             </div>
 
             {/* AI Chat */}
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 flex flex-col">
               <h3 className="text-xl font-semibold text-white mb-4">🤖 AI Assistant</h3>
-              <p className="text-white/70 mb-4">Get AI-powered market insights and trading advice</p>
+              <p className="text-white/70 mb-4 flex-1">Get AI-powered market insights and trading advice</p>
               <button
                 onClick={() => router.push('/chatbot')}
-                className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-500 hover:to-purple-500 transition-colors"
+                className="cursor-target w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-500 hover:to-purple-500 transition-colors"
               >
                 Start AI Chat
               </button>
-            </div>              {/* Predictions */}
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+            </div>
+
+              {/* Predictions */}
+              <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 flex flex-col">
                 <h3 className="text-xl font-semibold text-white mb-4">Predictions</h3>
-                <p className="text-white/70 mb-4">Advanced ML predictions up to 30 days</p>
+                <p className="text-white/70 mb-4 flex-1">Advanced ML predictions up to 30 days</p>
                 <button
                   onClick={() => router.push('/prediction')}
-                  className="w-full px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-600 text-white font-semibold rounded-lg hover:from-orange-500 hover:to-amber-500 transition-colors"
+                  className="cursor-target w-full px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-600 text-white font-semibold rounded-lg hover:from-orange-500 hover:to-amber-500 transition-colors"
                 >
                   View Predictions
                 </button>
@@ -301,7 +303,7 @@ export default function Dashboard(): React.ReactElement {
                       <button
                         key={stock}
                         onClick={() => router.push(`/stocks/${stock}`)}
-                        className="p-4 rounded-lg bg-white/10 border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-200 font-semibold text-white/90 hover:text-white"
+                        className="cursor-target p-4 rounded-lg bg-white/10 border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-200 font-semibold text-white/90 hover:text-white"
                       >
                         {stock}
                       </button>
