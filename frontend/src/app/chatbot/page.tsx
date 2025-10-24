@@ -47,7 +47,7 @@ export default function ChatbotPage() {
         const userName = user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim();
         
         if (userEmail) {
-          console.log('🚀 ATTEMPTING TO SAVE USER PROFILE:', { userId: user.id, email: userEmail, name: userName });
+          console.log('ATTEMPTING TO SAVE USER PROFILE:', { userId: user.id, email: userEmail, name: userName });
           
           const response = await fetch('/api/user/save', {
             method: 'POST',
@@ -60,9 +60,9 @@ export default function ChatbotPage() {
           });
           
           const result = await response.json();
-          console.log('✅ USER PROFILE SAVE RESULT:', result);
+          console.log('USER PROFILE SAVE RESULT:', result);
         } else {
-          console.error('❌ NO USER EMAIL FOUND:', user);
+          console.error('NO USER EMAIL FOUND:', user);
         }
       } catch (error) {
         console.error('Failed to save user profile:', error);
@@ -105,7 +105,7 @@ export default function ChatbotPage() {
         // Add welcome if no history
         const welcomeMessage: Message = {
           id: 'welcome',
-          text: `Welcome to Credence AI! 👋 I'm your financial trading assistant. Ask me anything about stocks, trading strategies, market analysis, or investment planning. How can I help you today?`,
+          text: `Welcome to Credence AI! I'm your financial trading assistant. Ask me anything about stocks, trading strategies, market analysis, or investment planning. How can I help you today?`,
           isUser: false,
           timestamp: new Date().toISOString()
         };
@@ -140,12 +140,12 @@ export default function ChatbotPage() {
     setShowSuggestions(false);
 
     try {
-      console.log('🚀 Sending message to Gemini:', textToSend);
+      console.log('Sending message to Gemini:', textToSend);
       
       // Get AI response from Gemini
       const aiResponse = await sendMessageToGemini(textToSend);
       
-      console.log('✅ Received Gemini response:', aiResponse);
+      console.log('Received Gemini response:', aiResponse);
 
       // Add AI response
       const assistantMessage: Message = {
@@ -169,7 +169,7 @@ export default function ChatbotPage() {
       }
 
     } catch (error) {
-      console.error('❌ Chat error:', error);
+      console.error('Chat error:', error);
       
       // Add error message
       const errorMessage: Message = {

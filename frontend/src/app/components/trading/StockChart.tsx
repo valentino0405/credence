@@ -135,8 +135,8 @@ export default function StockChart({ symbol }: StockChartProps) {
           <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
           <span>Closing Price</span>
         </div>
-        <span>📊 Last 30 days</span>
-        <span>🕒 {symbol}</span>
+        <span>Last 30 days</span>
+        <span>{symbol}</span>
       </div>
     </div>
   );

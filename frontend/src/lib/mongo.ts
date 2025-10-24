@@ -4,7 +4,7 @@ const uri = process.env.MONGODB_URI || '';
 const dbName = process.env.DB_NAME || 'credence';
 
 if (!uri) {
-  console.warn('⚠️ MONGODB_URI not set. Chat persistence will fail.');
+  console.warn('MONGODB_URI not set. Chat persistence will fail.');
 }
 
 let client: MongoClient | null = null;

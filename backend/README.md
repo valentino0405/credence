@@ -2,7 +2,7 @@
 
 Advanced FastAPI backend with AI-powered trading, predictions, and chatbot functionality.
 
-## 🚀 Setup Instructions
+## Setup Instructions
 
 ### 1. Environment Setup
 ```bash
@@ -32,7 +32,7 @@ python -m uvicorn app:app --reload --host 0.0.0.0 --port 8000
 
 Server will be running at: http://127.0.0.1:8000
 
-## 🔧 New Features & APIs
+## New Features & APIs
 
 ### 1. Enhanced Trading System
 - **Portfolio Performance**: `/trading/portfolio-performance/{user_id}`
@@ -102,7 +102,7 @@ Server will be running at: http://127.0.0.1:8000
 }
 ```
 
-## 📊 API Documentation
+## API Documentation
 
 ### Trading Endpoints
 - `GET /trading/portfolio-performance/{user_id}` - Get portfolio analytics
@@ -125,7 +125,7 @@ Server will be running at: http://127.0.0.1:8000
 - `GET /stock-data/{ticker}` - Real-time stock data
 - `GET /news/{ticker}` - Stock news
 
-## 🏗️ Architecture
+## Architecture
 
 ### Services Layer
 - `trading_service.py` - Enhanced mock trading with analytics
@@ -145,19 +145,19 @@ Server will be running at: http://127.0.0.1:8000
 - **Confidence decay** for extended predictions
 - **Scenario modeling** for risk assessment
 
-## 🔒 Security Features
+## Security Features
 - Input validation with Pydantic
 - Rate limiting on API endpoints
 - Error handling and logging
 - Secure environment variables
 
-## 📈 Performance
+## Performance
 - Async operations with FastAPI
 - Caching for stock data
 - Optimized database queries
 - Background task processing
 
-## 🧪 Testing
+## Testing
 ```bash
 # Run tests
 python -m pytest tests/
@@ -167,7 +167,7 @@ curl http://localhost:8000/trading/portfolio-performance/test_user
 curl http://localhost:8000/extended-prediction/AAPL
 ```
 
-## 🚀 Production Deployment
+## Production Deployment
 1. Set environment variables
 2. Configure database connections
 3. Enable HTTPS

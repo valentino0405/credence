@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
     const dbCtx = await getDb();
     if (!dbCtx) {
-      console.warn('⚠️ No DB connection. Returning success (non-persistent).');
+      console.warn('No DB connection. Returning success (non-persistent).');
       return NextResponse.json({ success: true, persisted: false });
     }
 

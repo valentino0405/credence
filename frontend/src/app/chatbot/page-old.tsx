@@ -25,7 +25,7 @@ export default function ChatbotPage(): React.ReactElement {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       type: 'assistant',
-      message: '👋 Hello! I\'m **CREDENCE AI**, your personal stock market analyst and trading assistant. \n\n🎯 I can help you with:\n- **Stock Analysis** & Real-time insights\n- **Portfolio Management** & Risk assessment\n- **Market Trends** & Trading strategies\n- **Technical Analysis** & Predictions\n\nWhat would you like to know about the markets today?',
+      message: 'Hello! I\'m **CREDENCE AI**, your personal stock market analyst and trading assistant. \n\nI can help you with:\n- **Stock Analysis** & Real-time insights\n- **Portfolio Management** & Risk assessment\n- **Market Trends** & Trading strategies\n- **Technical Analysis** & Predictions\n\nWhat would you like to know about the markets today?',
       timestamp: new Date().toISOString()
     }
   ]);
@@ -101,8 +101,8 @@ export default function ChatbotPage(): React.ReactElement {
 
     try {
       const apiUrl = `${API_BASE_URL}/send`;
-      console.log('🚀 Calling API:', apiUrl);
-      console.log('📦 Sending data:', { user_id: user.id, message: messageText.trim() });
+      console.log('Calling API:', apiUrl);
+      console.log('Sending data:', { user_id: user.id, message: messageText.trim() });
       
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -115,17 +115,17 @@ export default function ChatbotPage(): React.ReactElement {
         })
       });
       
-      console.log('📬 Response status:', response.status);
-      console.log('📬 Response headers:', response.headers);
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('❌ API Error Response:', errorText);
+        console.error('API Error Response:', errorText);
         throw new Error(`HTTP error! status: ${response.status} - ${errorText}`)
       }
 
       const data = await response.json();
-      console.log('✅ Received response data:', data);
+      console.log('Received response data:', data);
       
       if (data.success) {
         const assistantMessage: ChatMessage = {
@@ -143,7 +143,7 @@ export default function ChatbotPage(): React.ReactElement {
       
       const errorMessage: ChatMessage = {
         type: 'assistant',
-        message: '🔧 I\'m experiencing some technical difficulties right now. Please try again in a moment, or refresh the page if the issue persists.',
+        message: 'I\'m experiencing some technical difficulties right now. Please try again in a moment, or refresh the page if the issue persists.',
         timestamp: new Date().toISOString()
       };
       
@@ -217,13 +217,13 @@ export default function ChatbotPage(): React.ReactElement {
                 onClick={() => window.location.reload()}
                 className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg border border-white/20 transition-all duration-200"
               >
-                🔄 New Chat
+                New Chat
               </button>
               <button
                 onClick={() => router.push('/dashboard')}
                 className="px-4 py-2 bg-purple-600/80 hover:bg-purple-600 text-white rounded-lg transition-all duration-200"
               >
-                📊 Dashboard
+                Dashboard
               </button>
             </div>
           </div>
@@ -286,7 +286,7 @@ export default function ChatbotPage(): React.ReactElement {
           {showSuggestions && suggestedQuestions.length > 0 && (
             <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-6">
               <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-                💡 Try asking me about:
+                Try asking me about:
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {suggestedQuestions.slice(0, 4).map((category, categoryIndex) => (
@@ -335,7 +335,7 @@ export default function ChatbotPage(): React.ReactElement {
                   : 'bg-white/20 text-white/50 cursor-not-allowed'
               }`}
             >
-              {isLoading ? '⏳' : '🚀 Send'}
+                {isLoading ? 'Loading...' : 'Send'}
             </button>
           </div>
           
@@ -345,25 +345,25 @@ export default function ChatbotPage(): React.ReactElement {
               onClick={() => sendMessage("Analyze my portfolio performance")}
               className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white rounded-full text-xs border border-white/20 transition-all duration-200"
             >
-              📊 Portfolio Analysis
+                              Portfolio Analysis
             </button>
             <button
               onClick={() => sendMessage("What's the current market sentiment?")}
               className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white rounded-full text-xs border border-white/20 transition-all duration-200"
             >
-              📈 Market Sentiment
+                              Market Sentiment
             </button>
             <button
               onClick={() => sendMessage("Suggest some good stocks to buy today")}
               className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white rounded-full text-xs border border-white/20 transition-all duration-200"
             >
-              💡 Stock Suggestions
+                              Stock Suggestions
             </button>
             <button
               onClick={() => sendMessage("Explain technical analysis basics")}
               className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white rounded-full text-xs border border-white/20 transition-all duration-200"
             >
-              📚 Learn Trading
+                              Learn Trading
             </button>
           </div>
         </div>

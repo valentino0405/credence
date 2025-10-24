@@ -125,7 +125,7 @@ export default function Dashboard(): React.ReactElement {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-300 to-blue-300 bg-clip-text text-transparent">
-            🚀 AI Trading Dashboard
+            AI Trading Dashboard
           </h1>
           <p className="text-xl text-white/70">Welcome back, {user?.firstName || 'Trader'}!</p>
         </div>
@@ -174,7 +174,7 @@ export default function Dashboard(): React.ReactElement {
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
               {/* Stock Analysis */}
               <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                <h3 className="text-xl font-semibold text-white mb-4">📊 Stock Analysis</h3>
+                <h3 className="text-xl font-semibold text-white mb-4">Stock Analysis</h3>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <input
                     type="text"
@@ -194,7 +194,7 @@ export default function Dashboard(): React.ReactElement {
 
             {/* Trading Platform */}
             <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-              <h3 className="text-xl font-semibold text-white mb-4">💰 Mock Trading</h3>
+              <h3 className="text-xl font-semibold text-white mb-4">Mock Trading</h3>
               <p className="text-white/70 mb-4">Practice trading with real market data and AI insights</p>
               <button
                 onClick={() => router.push('/dashboard/trading')}
@@ -216,7 +216,7 @@ export default function Dashboard(): React.ReactElement {
               </button>
             </div>              {/* Predictions */}
               <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                <h3 className="text-xl font-semibold text-white mb-4">🔮 Predictions</h3>
+                <h3 className="text-xl font-semibold text-white mb-4">Predictions</h3>
                 <p className="text-white/70 mb-4">Advanced ML predictions up to 30 days</p>
                 <button
                   onClick={() => router.push('/prediction')}
@@ -232,7 +232,7 @@ export default function Dashboard(): React.ReactElement {
               {/* Holdings */}
               {portfolioData && portfolioData.holdings.length > 0 && (
                 <div className="lg:col-span-2 bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                  <h3 className="text-xl font-semibold text-white mb-6">📈 Your Holdings</h3>
+                  <h3 className="text-xl font-semibold text-white mb-6">Your Holdings</h3>
                   <div className="space-y-4">
                     {portfolioData.holdings.map((holding, index) => (
                       <div key={index} className="flex items-center justify-between p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
@@ -295,7 +295,7 @@ export default function Dashboard(): React.ReactElement {
               {/* Popular Stocks - Show when no holdings */}
               {(!portfolioData || portfolioData.holdings.length === 0) && (
                 <div className="lg:col-span-2 bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                  <h3 className="text-xl font-semibold text-white mb-6">🔥 Popular Stocks</h3>
+                  <h3 className="text-xl font-semibold text-white mb-6">Popular Stocks</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {popularStocks.map((stock) => (
                       <button
@@ -314,15 +314,15 @@ export default function Dashboard(): React.ReactElement {
             {/* Getting Started Section for New Users */}
             {(!portfolioData || portfolioData.holdings.length === 0) && (
               <div className="mt-8 bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-md rounded-xl p-6 border border-white/20">
-                <h3 className="text-2xl font-semibold text-white mb-4">🎯 Get Started with AI Trading</h3>
+                <h3 className="text-2xl font-semibold text-white mb-4">Get Started with AI Trading</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="text-center">
-                    <div className="text-4xl mb-3">📊</div>
+                    <div className="text-4xl mb-3">Chart</div>
                     <h4 className="text-lg font-semibold text-white mb-2">Analyze Stocks</h4>
                     <p className="text-white/70 text-sm">Research stocks with real-time data and AI insights</p>
                   </div>
                   <div className="text-center">
-                    <div className="text-4xl mb-3">🔮</div>
+                    <div className="text-4xl mb-3">AI</div>
                     <h4 className="text-lg font-semibold text-white mb-2">AI Predictions</h4>
                     <p className="text-white/70 text-sm">Get 30-day price predictions with confidence levels</p>
                   </div>

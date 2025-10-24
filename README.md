@@ -1,34 +1,34 @@
-# 🚀 Advanced Stock Prediction System
+# Advanced Stock Prediction System
 
 An AI-powered stock prediction platform using XGBoost machine learning with Next.js frontend and FastAPI backend.
 
-## ✨ Features
+## Features
 
-### 🤖 AI-Powered Predictions
+### AI-Powered Predictions
 - **XGBoost Model**: Advanced machine learning model trained on technical indicators
 - **Multi-timeframe Predictions**: Next day, 3-day, and weekly forecasts
 - **Confidence Scores**: Model confidence ratings for each prediction
 - **Accuracy Metrics**: Real-time model performance tracking
 
-### 📊 Advanced Analytics
+### Advanced Analytics
 - **Technical Indicators**: RSI, MACD, Bollinger Bands, Stochastic Oscillator
 - **Market Sentiment**: Overall market trend analysis
 - **Price Comparisons**: Current vs predicted price analysis
 - **Historical Accuracy**: Track prediction accuracy over time
 
-### 🎨 Modern Interface
+### Modern Interface
 - **Real-time Charts**: Interactive candlestick and line charts
 - **Aurora Background**: Beautiful animated backgrounds
 - **Responsive Design**: Works on all devices
 - **Dark Theme**: Professional trading interface
 
-### 📈 Market Overview
+### Market Overview
 - **Multiple Stocks**: Track popular stocks simultaneously
 - **Market Sentiment**: Overall market bullish/bearish indicators
 - **Live Updates**: Real-time price and prediction updates
 - **Click-through Navigation**: Easy access to detailed stock analysis
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Backend
 - **FastAPI**: High-performance Python web framework
@@ -44,7 +44,7 @@ An AI-powered stock prediction platform using XGBoost machine learning with Next
 - **ApexCharts**: Interactive chart library
 - **Clerk**: Authentication system
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Python 3.8+
@@ -96,12 +96,10 @@ An AI-powered stock prediction platform using XGBoost machine learning with Next
    npm run dev
    ```
 
-## 🔗 Access Points
-- **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
 - **API Documentation**: http://localhost:8000/docs
 
-## 📱 Usage
+## Usage
 
 ### 1. Dashboard
 - Enter stock ticker symbols (e.g., AAPL, GOOGL)
@@ -126,7 +124,7 @@ An AI-powered stock prediction platform using XGBoost machine learning with Next
 - Quick stock comparisons
 - Bulk prediction updates
 
-## 🤖 AI Model Features
+## AI Model Features
 
 ### Technical Indicators Used
 - **Moving Averages**: EMA(9), SMA(5,10,15,30)
@@ -143,7 +141,7 @@ An AI-powered stock prediction platform using XGBoost machine learning with Next
 - **Confidence Intervals**: Prediction reliability
 - **Backtesting**: Historical accuracy validation
 
-## 🔧 API Endpoints
+## API Endpoints
 
 ### Core Endpoints
 - `GET /candlestick-data?ticker={symbol}` - Real-time OHLC data
@@ -157,41 +155,50 @@ An AI-powered stock prediction platform using XGBoost machine learning with Next
 - `GET /stock-info/{ticker}` - Basic stock information
 - `GET /prediction-history/{ticker}` - Prediction accuracy metrics
 
-## 🎯 Key Features Implemented
+- `GET /advanced-prediction/{ticker}?days={n}` - Multi-day forecasts
+- `POST /train-model/{ticker}` - Train/retrain model
+- `GET /model-status` - Model training status
+- `GET /prediction-history/{ticker}` - Historical accuracy
 
-### ✅ Completed Features
+### Stock Information
+- `GET /stock-info/{ticker}` - Basic stock information
+- `GET /prediction-history/{ticker}` - Prediction accuracy metrics
 
-1. **🧠 Advanced ML Model**
+## Key Features Implemented
+
+### Completed Features
+
+1. **Advanced ML Model**
    - XGBoost with 25+ technical indicators
    - Feature engineering from your notebook
    - Model persistence and loading
    - Background training capability
 
-2. **🔮 Real-time Predictions**
+2. **Real-time Predictions**
    - Next day price predictions
    - Multi-day forecasting (up to 30 days)
    - Confidence scoring
    - Trend analysis (BULLISH/BEARISH)
 
-3. **📊 Enhanced UI Components**
+3. **Enhanced UI Components**
    - Interactive candlestick charts
    - Prediction visualization
    - Accuracy metrics display
    - Current vs predicted comparisons
 
-4. **🌐 Market Dashboard**
+4. **Market Dashboard**
    - Multiple stock monitoring
    - Market sentiment analysis
    - Bulk prediction updates
    - Click-through navigation
 
-5. **⚡ Performance Features**
+5. **Performance Features**
    - Modular code architecture
    - Efficient API endpoints
    - Background model training
    - Error handling and fallbacks
 
-## 🔮 Advanced Usage
+## Advanced Usage
 
 ### Training Custom Models
 ```python
@@ -211,7 +218,7 @@ GET /advanced-prediction/AAPL?days=14
 GET /prediction-history/AAPL?days_back=30
 ```
 
-## ⚠️ Important Notes
+## Important Notes
 
 ### Model Accuracy
 - The XGBoost model provides educational predictions
@@ -231,7 +238,7 @@ GET /prediction-history/AAPL?days_back=30
 - Background training doesn't block API calls
 - Model auto-saves for persistence
 
-## 🎨 UI Features
+## UI Features
 
 ### Design Elements
 - **Aurora Backgrounds**: Animated gradient backgrounds
@@ -246,7 +253,7 @@ GET /prediction-history/AAPL?days_back=30
 - **Error Handling**: Graceful error messages
 - **Accessibility**: Keyboard and screen reader support
 
-## 🚨 Disclaimer
+## Disclaimer
 
 This application is for **educational and demonstration purposes only**. The AI predictions:
 - Should NOT be used as financial advice
@@ -256,7 +263,7 @@ This application is for **educational and demonstration purposes only**. The AI 
 
 **Always consult with financial professionals before making investment decisions.**
 
-## 🤝 Contributing
+## Contributing
 
 Feel free to enhance this project by:
 - Adding more technical indicators
@@ -265,10 +272,10 @@ Feel free to enhance this project by:
 - Adding more data sources
 - Implementing additional features
 
-## 📄 License
+## License
 
 This project is for educational use. Please ensure compliance with data provider terms of service.
 
 ---
 
-**Built with ❤️ using XGBoost, FastAPI, and Next.js**
+**Built with using XGBoost, FastAPI, and Next.js**

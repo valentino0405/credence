@@ -81,22 +81,22 @@ export default function StockPage(): React.ReactElement {
       setAIError(null);
       
       const url = `${API_BASE_URL}/ai-prediction/${ticker}`;
-      console.log('🚀 Fetching AI predictions from:', url);
+      console.log('Fetching AI predictions from:', url);
       
       const response = await fetch(url);
-      console.log('📡 AI prediction response status:', response.status);
+      console.log('AI prediction response status:', response.status);
       
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('❌ AI prediction error:', response.status, errorText);
+        console.error('AI prediction error:', response.status, errorText);
         throw new Error(`Failed to fetch AI data: ${response.status} ${errorText}`);
       }
       
       const data = await response.json();
-      console.log('✅ AI prediction data received:', data);
+      console.log('AI prediction data received:', data);
       setAIData(data);
     } catch (err) {
-      console.error('❌ Failed to fetch AI data:', err);
+      console.error('Failed to fetch AI data:', err);
       setAIError(err instanceof Error ? err.message : 'Failed to load AI predictions');
       setAIData(null);
     } finally {
@@ -109,23 +109,23 @@ export default function StockPage(): React.ReactElement {
       setThirtyDayLoading(true);
       
       const url = `${API_BASE_URL}/prediction-30day/${ticker}`;
-      console.log('🚀 Fetching 30-day predictions from:', url);
+      console.log('Fetching 30-day predictions from:', url);
       
       const response = await fetch(url);
-      console.log('📡 30-day prediction response status:', response.status);
+      console.log('30-day prediction response status:', response.status);
       
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('❌ 30-day prediction error:', response.status, errorText);
+        console.error('30-day prediction error:', response.status, errorText);
         throw new Error(`Failed to fetch 30-day data: ${response.status}`);
       }
       
       const data = await response.json();
-      console.log('✅ 30-day prediction data received:', data);
+      console.log('30-day prediction data received:', data);
       setThirtyDayData(data);
       setShowThirtyDay(true);
     } catch (err) {
-      console.error('❌ Failed to fetch 30-day data:', err);
+      console.error('Failed to fetch 30-day data:', err);
       setThirtyDayData(null);
     } finally {
       setThirtyDayLoading(false);
@@ -290,7 +290,7 @@ export default function StockPage(): React.ReactElement {
             {/* Error State */}
             {aiError && (
               <div className="mb-4 p-3 rounded-lg border border-red-500/30 bg-red-500/10 text-red-300">
-                <div className="text-sm">❌ {aiError}</div>
+                <div className="text-sm">{aiError}</div>
                 <button 
                   onClick={() => fetchAIData()}
                   className="mt-2 px-3 py-1 text-xs bg-red-500/20 hover:bg-red-500/30 rounded border border-red-500/30 transition-colors"
@@ -304,7 +304,7 @@ export default function StockPage(): React.ReactElement {
             {!aiLoading && !aiError && aiData && (
               <div className="mb-6">
                 <div className={"mb-4 rounded-lg border px-3 py-2 text-sm font-medium " + (aiData.overall_trend === 'BULLISH' ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : 'border-red-500/30 bg-red-500/10 text-red-300')}>
-                  Overall Trend: {aiData.overall_trend === 'BULLISH' ? '📈 BULLISH' : '📉 BEARISH'}
+                  Overall Trend: {aiData.overall_trend === 'BULLISH' ? 'BULLISH' : 'BEARISH'}
                 </div>
 
                 {/* Model Accuracy Info */}
@@ -412,7 +412,7 @@ export default function StockPage(): React.ReactElement {
                   <div className="flex items-center gap-2">
                     <span className="text-white/80">Overall Trend:</span>
                     <span className={`font-semibold ${aiData.overall_trend === 'BULLISH' ? 'text-emerald-400' : 'text-red-400'}`}>
-                      {aiData.overall_trend === 'BULLISH' ? '📈 BULLISH' : '📉 BEARISH'}
+                      {aiData.overall_trend === 'BULLISH' ? 'BULLISH' : 'BEARISH'}
                     </span>
                   </div>
                   {aiData.model_accuracy?.mean_absolute_percentage_error && (
@@ -444,7 +444,7 @@ export default function StockPage(): React.ReactElement {
                   </>
                 ) : (
                   <>
-                    📈 Get 30-Day Forecast
+                    Get 30-Day Forecast
                   </>
                 )}
               </button>
@@ -470,7 +470,7 @@ export default function StockPage(): React.ReactElement {
                     <div className="flex justify-between items-center">
                       <span className="text-white/70">Overall Trend:</span>
                       <span className={`font-semibold ${thirtyDayData.overall_trend === 'BULLISH' ? 'text-emerald-400' : 'text-red-400'}`}>
-                        {thirtyDayData.overall_trend === 'BULLISH' ? '📈 BULLISH' : '📉 BEARISH'}
+                        {thirtyDayData.overall_trend === 'BULLISH' ? 'BULLISH' : 'BEARISH'}
                       </span>
                     </div>
 
@@ -517,7 +517,7 @@ export default function StockPage(): React.ReactElement {
               }}
               className="mt-4 w-full rounded-lg bg-emerald-600/80 hover:bg-emerald-600 text-white text-sm font-medium py-3 transition-colors flex items-center justify-center gap-2"
             >
-              🔄 Refresh Data
+              Refresh Data
             </button>
           </div>
         </div>

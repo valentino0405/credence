@@ -6,22 +6,20 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { userId, email, name } = body;
 
-    console.log('🔥 USER SAVE REQUEST:', { userId, email, name });
+    console.log('USER SAVE REQUEST:', { userId, email });
 
     if (!userId || !email) {
-      console.error('❌ Missing userId or email');
+            console.log('Missing userId or email');
       return NextResponse.json({ success: false, error: 'userId and email required' }, { status: 400 });
     }
 
     const dbCtx = await getDb();
     if (!dbCtx) {
-      console.error('❌ Database connection failed');
+            console.log('Database connection failed');
       return NextResponse.json({ success: false, error: 'Database connection failed' }, { status: 500 });
     }
 
-    console.log('✅ Database connected, saving user...');
-
-    // Upsert user profile
+      console.log('Database connected, saving user...');    // Upsert user profile
     const result = await dbCtx.db.collection('users').updateOne(
       { userId },
       {
@@ -38,7 +36,7 @@ export async function POST(request: NextRequest) {
       { upsert: true }
     );
 
-    console.log('✅ USER PROFILE SAVED TO DATABASE:', { 
+    console.log('USER PROFILE SAVED TO DATABASE:', { 
       userId, 
       email, 
       name, 
@@ -55,7 +53,7 @@ export async function POST(request: NextRequest) {
       upserted: result.upsertedCount
     });
   } catch (error) {
-    console.error('❌ USER SAVE ERROR:', error);
+    console.error('USER SAVE ERROR:', error);
     return NextResponse.json({ success: false, error: 'Failed to save user' }, { status: 500 });
   }
 }

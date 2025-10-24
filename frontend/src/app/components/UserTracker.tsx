@@ -16,7 +16,7 @@ export default function UserTracker() {
         const userName = user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim();
         
         if (userEmail) {
-          console.log('🔥 USER LOGGED IN - SAVING PROFILE:', { 
+          console.log('USER LOGGED IN - SAVING PROFILE:', { 
             userId: user.id, 
             email: userEmail, 
             name: userName 
@@ -35,20 +35,20 @@ export default function UserTracker() {
           const result = await response.json();
           
           if (result.success) {
-            console.log('✅ LOGIN USER PROFILE SAVED TO DATABASE:', {
+            console.log('LOGIN USER PROFILE SAVED TO DATABASE:', {
               userId: user.id,
               email: userEmail,
               name: userName,
               isNewUser: result.upserted > 0 ? 'YES' : 'NO'
             });
           } else {
-            console.error('❌ Failed to save login user profile:', result);
+            console.error('Failed to save login user profile:', result);
           }
         } else {
-          console.warn('⚠️ User logged in but no email found:', user);
+          console.warn('User logged in but no email found:', user);
         }
       } catch (error) {
-        console.error('❌ Error saving user profile on login:', error);
+        console.error('Error saving user profile on login:', error);
       }
     };
     

@@ -39,7 +39,7 @@ User question: ${message}`;
     const rawText = response.text || 'Sorry, I could not generate a response.';
     return formatToFiveLines(rawText);
   } catch (error) {
-    console.error('❌ Gemini AI error:', error);
+    console.error('Gemini AI error:', error);
     throw new Error('Failed to get response from AI assistant');
   }
 }
