@@ -277,5 +277,6 @@ Feel free to enhance this project by:
 This project is for educational use. Please ensure compliance with data provider terms of service.
 
 ---
+Kuch nahi thoda sa editing
 
 **Built with using XGBoost, FastAPI, and Next.js**
